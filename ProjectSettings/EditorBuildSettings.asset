@@ -9,9 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
-    path: Assets/arrow.unity
+    path: Assets/Scenes/arrow.unity
     guid: 828190cd4dcb1496ea8cd644b77d5da3
   - enabled: 1
-    path: Assets/pull.unity
+    path: Assets/Scenes/pull.unity
     guid: 2eac8b1b375e9445fbf6536f73a4fc87
   m_configObjects: {}
