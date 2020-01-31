@@ -1,0 +1,42 @@
+﻿
+
+
+#pragma kernel Count
+struct Vert{
+  float3 pos;
+  float3 vel;
+  float3 nor;
+  float3 ogPos;
+  float3 axis;
+  float life;
+};
+
+
+RWStructuredBuffer<float4> _OutBuffer;
+RWStructuredBuffer<Vert> _VertBuffer;
+
+
+uint _OutBuffer_COUNT;
+uint _VertBuffer_COUNT;
+
+#include "../Chunks/safeID.cginc"
+
+float _Time;
+
+#define NR_THREADS 128
+
+
+[numthreads(NR_THREADS,1,1)]
+void Count (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 id : SV_DispatchThreadID) {
+
+  //int pID = id.x + id.y * gridX + id.z * gridX * gridY;
+
+  uint pID = threadID + u3GroupID.x * NR_THREADS;
+
+  if( threadID == 0 ){
+  _OutBuffer[0] = float4(.1,cos(_Time),sin(_Time),.5);
+}
+
+  
+}
+

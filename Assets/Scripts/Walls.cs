@@ -7,6 +7,7 @@ public class Walls : MonoBehaviour
 
 
     public GameObject wallPrefab;
+    public GameObject platform;
 
     public ScreenInfo screen;
 
@@ -24,21 +25,23 @@ public int currHit;
       GameObject go;
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( screen.width /2 , 0 , 0 );
-        go.transform.localScale = new Vector3( .1f  , 2 , screen.height );
+        go.transform.localScale = new Vector3( .1f  , 10, screen.height );
       
         wallMat = go.GetComponent<Renderer>().sharedMaterial;
 
         go = Instantiate( wallPrefab );
-        go.transform.position = new Vector3( -screen.width /2 , 0 , 0 );
-        go.transform.localScale = new Vector3( .1f  , 2 , screen.height );
+        go.transform.position = new Vector3( -screen.width /2, 0 , 0 );
+        go.transform.localScale = new Vector3( .1f  , 10 ,screen.height );
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( 0 ,0 , screen.height/2 );
-        go.transform.localScale = new Vector3( screen.width , 2 , .1f );
+        go.transform.localScale = new Vector3( screen.width , 10 ,.1f );
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( 0 , 0, -screen.height/2 );
-        go.transform.localScale = new Vector3( screen.width , 2 , .1f  );
+        go.transform.localScale = new Vector3( screen.width , 10,.1f  );
+
+        platform.transform.localScale =new Vector3( screen.width , 10, screen.height  ) * .1f; 
 
     }
 

@@ -1,33 +1,24 @@
-      #include "../Chunks/ShadowCasterPos.cginc"
-   
+ #include "UnityCG.cginc"
+#include "../Chunks/StructIfDefs.cginc"
 
-      StructuredBuffer<Vert> _VertBuffer;
-      StructuredBuffer<int> _TriBuffer;
 
-      struct v2f {
+  struct v2f {
         V2F_SHADOW_CASTER;
-        float3 nor : NORMAL;
-        float3 worldPos : TEXCOORD1;
-        float2 uv : TEXCOORD0;
+        float2 uv : TEXCOORD1;
       };
 
 
-      v2f vert(appdata_base input, uint id : SV_VertexID)
+      v2f vert(appdata_base v, uint id : SV_VertexID)
       {
         v2f o;
-        Vert v = _VertBuffer[_TriBuffer[id]];
-
-        float4 position = ShadowCasterPos(v.pos, -v.nor);
-        o.pos = UnityApplyLinearShadowBias(position);
-        o.worldPos = v.pos;
-        o.uv = v.uv;
+        o.uv = _TransferBuffer[id].uv;
+        o.pos = mul(UNITY_MATRIX_VP, float4(_TransferBuffer[id].pos, 1));
         return o;
       }
 
       float4 frag(v2f i) : COLOR
       {
-
-        if( DoShadowDiscard(i.worldPos,i.uv) < .5 ){ discard; }
-
+        float4 col = tex2D(_Tex,i.uv);
+        if( col.a < .1){discard;}
         SHADOW_CASTER_FRAGMENT(i)
       }

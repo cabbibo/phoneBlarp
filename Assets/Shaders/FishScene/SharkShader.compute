@@ -1,0 +1,96 @@
+﻿#pragma kernel Flow
+
+
+struct Vert{
+  float3 pos;
+  float3 vel;
+  float3 nor;
+  float3 ogPos;
+  float3 axis;
+  float life;
+};
+
+struct Transform {
+  float4x4 localToWorld;
+  float4x4 worldToLocal;
+};
+
+
+int _HumanBuffer_COUNT;
+
+RWStructuredBuffer<Vert> _VertBuffer;
+RWStructuredBuffer<Transform> _TransformFollowBuffer;
+
+float4x4 _Transform;
+
+
+int _VertBuffer_COUNT;
+int _TransformFollowBuffer_COUNT;
+
+#include "../Chunks/safeID.cginc"
+#include "../Chunks/snoise.cginc"
+#include "../Chunks/hash.cginc"
+#include "../Chunks/curlNoise.cginc"
+
+
+float _Time;
+float _DT;
+
+#define NR_THREADS 128
+[numthreads(NR_THREADS,1,1)]
+void Flow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
+
+  int pID = threadID + u3GroupID.x * NR_THREADS;
+
+  pID = safeID(pID,_VertBuffer_COUNT);
+  Vert vert = _VertBuffer[pID];
+
+
+
+  if( vert.life <= .4 ){
+    vert.pos = mul( _Transform,float4(0,0,0,1)).xyz;
+    float3 up = mul( _Transform,float4(0,1,0,0));
+    float3 right = mul( _Transform,float4(1,0,0,0));
+    float3 back = mul( _Transform,float4(0,0,1,0));
+    vert.pos += 10*up   * ( hash(float(pID * 41)) - .5) * .16;//  * ( hash(float(pID * 31)) - .5) * .2;
+    vert.pos += 10*right * ( hash(float(pID * 11)) - .5) * .16;
+    vert.pos += 10*back  * ( hash(float(pID * 21)) - .5) * .16;
+
+    float3 v = float3( hash(float(pID * 20)),hash(float(pID * 42)),hash(float(pID * 32)));
+    v -= .5;
+
+    vert.axis = normalize( v);
+    float3 dir = normalize(mul( _Transform , float4(0,1,0,0)).xyz) * .1;
+    vert.vel = 0;// (v * 1 + dir) * .001;
+    vert.life = hash(float(pID)) * .5 + .5;
+   
+
+
+  }else{
+    
+    float3 force = 0;
+
+
+    float3 worldPos = mul(_TransformFollowBuffer[pID].localToWorld, float4(0,0,0,1)).xyz;
+     force += worldPos-vert.pos;// - fPos);
+
+
+
+
+     force += curlNoise( vert.pos * 10 ) * 1.1;
+    vert.vel += force * .9;
+
+    vert.vel = normalize( vert.vel) * .04;//_FlowSpeed;
+    vert.pos += vert.vel * _DT * 60;
+
+
+    vert.vel *= .9;
+
+      
+  }
+  
+ // vert.nor = mul(rotation(vert.axis,vert.life*20*(hash(float(pID*123)))+hash(float(pID * 23))),float4(0,0,1,0)).xyz;
+  
+  _VertBuffer[pID] = vert;
+
+}

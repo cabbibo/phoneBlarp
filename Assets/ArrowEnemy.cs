@@ -23,6 +23,7 @@ public class ArrowEnemy : MonoBehaviour
       if( c.gameObject.tag == "arrow" && this.enabled ){
         print("NEXT");
         game.DestroyEnemy( gameObject);
+        game.DestroyArrow( c.gameObject );
         game.Next();
       }
       if( c.gameObject.tag == "lawn" && this.enabled ){

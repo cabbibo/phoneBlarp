@@ -1,0 +1,104 @@
+﻿#pragma kernel Goo
+
+struct Vert{
+  float3 pos;
+  float3 vel;
+  float3 nor;
+  float3 tangent;
+  float2 uv;
+  float2 debug;
+};
+
+struct Transform{
+  float4x4 localToWorld;
+  float4x4 worldToLocal;
+};
+
+
+float3 _TouchLocation;
+float  _TouchPower;
+
+
+
+float3 _RO;
+float3 _RD;
+
+
+#include "../Chunks/GetRayForce.cginc"
+
+RWStructuredBuffer<Vert> _VertBuffer;
+RWStructuredBuffer<Vert> _SkeletonBuffer;
+RWStructuredBuffer<Transform> _TransformBuffer;
+RWStructuredBuffer<float4> _AudioBuffer;
+
+int _VertBuffer_COUNT;
+int _SkeletonBuffer_COUNT;
+int _TransformBuffer_COUNT;
+int _AudioBuffer_COUNT;
+
+
+float4x4 _Transform;
+
+float3 _Position1;
+float3 _Position2;
+
+float _DT;
+#include "../Chunks/safeID.cginc"
+
+
+float _Time;
+
+
+#include "../Chunks/noise.cginc"
+#define NR_THREADS 128
+[numthreads(NR_THREADS,1,1)]
+void Goo (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
+
+  int pID = threadID + u3GroupID.x * NR_THREADS;
+
+  int sID = safeID(pID, _VertBuffer_COUNT );
+
+
+  if( pID < _VertBuffer_COUNT ){
+    
+    Vert p = _VertBuffer[sID];
+    Vert b = _SkeletonBuffer[sID];
+
+    float3 targetPos = mul(_Transform, float4( b.pos , 1));
+
+    float3 force = -(p.pos - targetPos) * .04;// * (noise( b.pos * 3 + _Time) +1.1);//hash(float(pID));
+
+    float3 dif;
+
+    for( int i = 0; i < _TransformBuffer_COUNT; i++ ){
+      float3 p1 = mul(_TransformBuffer[i].localToWorld,float4(0,0,0,1));
+      float3 d1 = mul(_TransformBuffer[i].localToWorld,float4(0,0,1,0));
+      dif = normalize(p.pos - p1);
+      dif /= length(p.pos - p1);
+      float4 audio = _AudioBuffer[i*10];
+      force += dif * 11.1 * length(audio); 
+    }
+
+
+    if( length(_RO) != 0 && length(_RD) != 0 ){
+      force += GetRayForce( p.pos , .01 , .6);
+    }
+
+    // dif = -(p.pos - _Position2);
+    //dif /= length(dif);
+    //force += normalize(dif) * .01; 
+
+    p.vel += force;
+    p.pos += p.vel;
+    p.vel *= .9;
+
+    //p.pos      = mul(_Transform, float4( b.pos , 1));// = v;
+    p.nor      = normalize(mul(_Transform, float4( b.nor , 0)));
+    p.tangent  = normalize(mul(_Transform, float4( b.tangent , 0)));;
+    p.uv       = b.uv;
+
+    _VertBuffer[sID] = p;
+
+  }
+
+}

@@ -38,7 +38,7 @@
           Vert v1 = _VertBuffer[t1];
           Vert v2 = _VertBuffer[t2];
 
-          float3 pos;;
+          float3 pos;
           if( alternate == 0 ){
             pos = v1.pos;
           }else{

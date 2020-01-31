@@ -8,6 +8,7 @@ public class Game : MonoBehaviour
 
     public ScreenInfo screen;
     public Walls walls;
+    
 
      public int score;
     public TextMesh scoreText;

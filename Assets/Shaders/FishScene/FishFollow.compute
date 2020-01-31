@@ -1,0 +1,97 @@
+﻿#pragma kernel Flow
+
+
+struct Vert{
+  float3 pos;
+  float3 vel;
+  float3 nor;
+  float3 ogPos;
+  float3 axis;
+  float life;
+};
+
+struct Trans {
+  float4x4 localToWorld;
+  float4x4 worldToLocal;
+};
+
+
+RWStructuredBuffer<Vert> _VertBuffer;
+RWStructuredBuffer<Vert> _HeadBuffer;
+
+int _ParticlesPerTrail;
+
+
+float4x4 _Transform;
+
+
+int _VertBuffer_COUNT;
+int _HeadBuffer_COUNT;
+
+#include "../Chunks/safeID.cginc"
+#include "../Chunks/snoise.cginc"
+#include "../Chunks/hash.cginc"
+#include "../Chunks/curlNoise.cginc"
+
+
+
+
+
+#define NR_THREADS 128
+[numthreads(NR_THREADS,1,1)]
+void Flow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
+
+  int pID = threadID + u3GroupID.x * NR_THREADS;
+
+  int idInTrail = pID % _ParticlesPerTrail;
+  int headID = pID / _ParticlesPerTrail;
+
+  pID = safeID(pID,_VertBuffer_COUNT);
+  Vert vert = _VertBuffer[pID];
+  Vert head = _HeadBuffer[safeID( headID , _HeadBuffer_COUNT )];
+
+  Vert targetVert;
+  if( idInTrail == 0){
+    targetVert = head;
+  }else{
+    targetVert = _VertBuffer[pID-1];
+  }
+
+
+  //head.life -= .0001 / length( head.pos - _VertBuffer[headID + _ParticlesPerTrail-1].pos );
+    _HeadBuffer[headID] = head;
+
+  if( vert.life == 0 ){ vert.life = hash(float(pID)); }
+ //vert.life = head.life;//lerp( vert.life , targetVert.life , .1 );
+
+  if( vert.life < 0  || abs(vert.life-targetVert.life) > .2 ){
+
+    vert.pos = head.pos;
+    vert.life = targetVert.life;
+    //vert.life = hash(float(pID)); 
+
+  }else{
+    
+    float3 force = 0;
+
+
+    force += -(vert.pos - targetVert.pos) * .01;
+
+
+    force += curlNoise(vert.pos) * .0001;
+
+  
+    vert.vel += force;
+    vert.pos += vert.vel;
+
+
+    vert.vel *= .7;//* minDist;
+    vert.life = head.life;
+  
+  }
+  
+ // vert.nor = mul(rotation(vert.axis,vert.life*20*(hash(float(pID*123)))+hash(float(pID * 23))),float4(0,0,1,0)).xyz;
+  
+  _VertBuffer[pID] = vert;
+
+}
