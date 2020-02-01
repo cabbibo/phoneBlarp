@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.iOS;
 
 
+[ExecuteAlways]
 public class TouchBlarp : Game
 {
 
@@ -13,6 +14,7 @@ public class TouchBlarp : Game
     public GameObject touch;
     public GameObject target;
     public Glitch glitch;
+    public Breath breath;
 
 
 
@@ -102,10 +104,12 @@ public class TouchBlarp : Game
     {
 
           if(Input.GetMouseButtonDown(0)){
-            touchDown = true;
+            if( !breath.cooling ) touchDown = true;
           }
 
           if (Input.GetMouseButton(0) && touchDown ){
+            
+            breath.breathing = false;
 
             if( inMenu == true ){ inMenu = false; }
 
@@ -135,7 +139,9 @@ public class TouchBlarp : Game
             touchAudioSource.pitch  =  Mathf.Clamp( 4/(touch.transform.position - blarp.transform.position).magnitude,0 , 10);
             touchAudioSource.volume = Mathf.Lerp( touchAudioSource.volume , 1 , .5f );
 
-          }else{
+          }else{ 
+
+            if( breath.cooling == false ){ breath.breathing = true; }
             
             touch.transform.position = Vector3.one * 1000;
           
@@ -194,7 +200,6 @@ public class TouchBlarp : Game
 
 
      if( glitch.glitchPow > 1 ){
-
           if(glitch.enabled == true ){
             glitch.enabled = false;
 

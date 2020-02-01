@@ -29,25 +29,25 @@ public class Haptico : MonoBehaviour
     }
 
     public void TriggerSelectionChange(){
-      iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)0);
+      if( Application.isPlaying) iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)0);
     }
     
     public void TriggerImpactLight(){
-      iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)1);
+       if( Application.isPlaying) iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)1);
     }
     public void TriggerImpactMedium(){
-      iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)2);
+       if( Application.isPlaying) iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)2);
     }
      public void TriggerImpactHeavy(){
-      iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)3);
+       if( Application.isPlaying) iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)3);
     }
 
     public void TriggerSuccess(){
-      iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)4);
+       if( Application.isPlaying) iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)4);
     }
 
     public void TriggerWarning(){
-      iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)5);
+       if( Application.isPlaying) iOSHapticFeedback.Instance.Trigger((iOSHapticFeedback.iOSFeedbackType)5);
     }
 
     public void TriggerFailuer(){

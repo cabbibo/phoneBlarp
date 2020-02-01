@@ -37,7 +37,7 @@
             float4 _MainTex_ST;
 
             uniform float4 _Hits[10];
-
+            uniform int _Cooling;
 
 
             v2f vert (appdata v)
@@ -69,7 +69,9 @@
                 col = float4(1,0,0,1);
                 col = float4(normalize(v.closest.xyz) ,1);//saturate( 10- length(v.closest) * 1 );
                 col = 4*tex2D(_MainTex,length(v.closest.xyz) * .1 - _Time.y )  * saturate(1-(_Time.y-v.closest.w)) / length(v.closest.xyz);
-                
+                if(_Cooling == 1 ){
+                    col = (sin( _Time.y  * 12 )+1) * float4(1,0,0,1);
+                }
                 return col;
             }
             ENDCG

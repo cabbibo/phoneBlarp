@@ -345,6 +345,7 @@ public class Cycle : MonoBehaviour{
 
   protected void DoDestroy(){
     
+    if(Cycles == null ){ Cycles = new List<Cycle>();}
     for (int i = Cycles.Count - 1; i >= 0; i--){
         if (Cycles[i] == null ){
             Cycles.RemoveAt(i);

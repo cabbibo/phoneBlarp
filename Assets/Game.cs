@@ -29,7 +29,9 @@ public class Game : MonoBehaviour
 
 
     public void _OnAwake(){
- 
+  
+      walls.DestroyWalls();
+    
       highScore =  PlayerPrefs.GetInt ("highScore");
       hasReviewed =  PlayerPrefs.GetInt ("hasReviewed");
       Application.targetFrameRate = 60;

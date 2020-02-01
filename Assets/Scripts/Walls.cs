@@ -18,31 +18,47 @@ public int currHit;
 
     public Material wallMat;
 
+    public GameObject[] walls;
 
     public void MakeWalls(){
+
+      walls = new GameObject[4];
+
 
       hits = new Vector4[10];
       GameObject go;
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( screen.width /2 , 0 , 0 );
         go.transform.localScale = new Vector3( .1f  , 10, screen.height );
-      
-        wallMat = go.GetComponent<Renderer>().sharedMaterial;
+        walls[0] = go;
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( -screen.width /2, 0 , 0 );
         go.transform.localScale = new Vector3( .1f  , 10 ,screen.height );
+        walls[1] = go;
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( 0 ,0 , screen.height/2 );
         go.transform.localScale = new Vector3( screen.width , 10 ,.1f );
+        walls[2] = go;
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( 0 , 0, -screen.height/2 );
         go.transform.localScale = new Vector3( screen.width , 10,.1f  );
+        walls[3] = go;
 
+
+        wallMat = go.GetComponent<Renderer>().sharedMaterial;
         platform.transform.localScale =new Vector3( screen.width , 10, screen.height  ) * .1f; 
 
+    }
+
+    public void DestroyWalls(){
+      if( walls.Length == 4 ){
+      for( int i = 0; i <4; i++ ){
+        DestroyImmediate( walls[i]);
+      }
+    }
     }
 
 
