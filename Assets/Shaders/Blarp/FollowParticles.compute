@@ -1,0 +1,57 @@
+﻿#pragma kernel Follow
+
+
+#include "../Chunks/noise.cginc"
+#include "../Chunks/snoise.cginc"
+#include "../Chunks/curlNoise.cginc"
+
+
+float3 _Leader;
+
+
+
+
+struct Vert{
+  float3 pos;
+  float3 oPos;
+  float3 nor;
+  float3 tang;
+  float2 uv;
+  float2 debug;
+};
+
+
+RWStructuredBuffer<Vert> _VertBuffer;
+
+uint _VertBuffer_COUNT;
+
+
+#include "../Chunks/safeID.cginc"
+
+
+#define NR_THREADS 64
+[numthreads(NR_THREADS,1,1)]
+void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 id : SV_DispatchThreadID) {
+
+  //int pID = id.x + id.y * gridX + id.z * gridX * gridY;
+
+  uint pID = threadID + u3GroupID.x * NR_THREADS;
+  if( pID < _VertBuffer_COUNT ){
+
+    pID = safeID( pID , _VertBuffer_COUNT );
+    Vert vert = _VertBuffer[pID];
+
+    if( pID == 0 ){
+      vert.pos = lerp( vert.pos , _Leader , .1 );
+    }else{
+      float3 up = _VertBuffer[ safeID(pID-1 , _VertBuffer_COUNT )].pos;
+      vert.pos = lerp( vert.pos , up , .1 );
+    }
+    _VertBuffer[pID] = vert;
+
+
+
+
+  }
+  
+}

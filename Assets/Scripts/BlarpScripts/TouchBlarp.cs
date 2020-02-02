@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.iOS;
+using IMMATERIA;
 
 
 [ExecuteAlways]
@@ -42,7 +43,7 @@ public class TouchBlarp : Game
     private AudioSource touchAudioSource;
 
 
-    public AudioSource targetHitSource;
+    public PlayRandomFromArray targetHitSource;
     public AudioSource blarpHitSource;
     public AudioSource startHitSource;
 
@@ -134,7 +135,7 @@ public class TouchBlarp : Game
 
             touchLR.SetPosition( 0 , blarp.transform.position + dif * .2f -Camera.main.transform.forward * upConnectionDist);
             touchLR.SetPosition( 1 , blarp.transform.position + dif * .5f -Camera.main.transform.forward * upConnectionDist);
-            touchLR.SetWidth(.6f, 0);
+            touchLR.SetWidth(.06f, 0);
 
             touchAudioSource.pitch  =  Mathf.Clamp( 4/(touch.transform.position - blarp.transform.position).magnitude,0 , 10);
             touchAudioSource.volume = Mathf.Lerp( touchAudioSource.volume , 1 , .5f );
@@ -215,7 +216,7 @@ public class TouchBlarp : Game
 
 
     public override void DoRestart(){
-  for( int i = 0; i < sharks.Count; i++ ){
+    for( int i = 1; i < sharks.Count; i++ ){
         Destroy( sharks[i] );
         Destroy( sharkTrails[i] );
       }
@@ -240,6 +241,8 @@ public class TouchBlarp : Game
 
       blarpTrail.time = .3f;
       sharkTrail.time = .3f;
+
+      UpdateTransformBuffer();
     }
 
    
@@ -252,6 +255,20 @@ public class TouchBlarp : Game
       MiniGlitch();
 
       SpawnShark();
+
+      UpdateTransformBuffer();
+    }
+
+    public TransformBuffer transformBuffer;
+    public void UpdateTransformBuffer(){
+      List<Transform> transforms = new List<Transform>();
+      transforms.Add( blarp.transform );
+      foreach( GameObject shark in sharks ){
+        transforms.Add( shark.transform );
+      }
+      transforms.Add( touch.transform );
+      transforms.Add( target.transform );
+      transformBuffer.Remake( transforms);
     }
 
     public override void DoNewHighScore(){
@@ -279,8 +296,8 @@ public class TouchBlarp : Game
     }
 
     public void SpawnShark(){
-      GameObject shark = Instantiate( sharkPrefab);
-      GameObject sharkTrail = Instantiate( sharkTrailPrefab );
+      GameObject shark = sharkPrefab;//Instantiate( sharkPrefab);
+      GameObject sharkTrail = sharkTrailPrefab;//Instantiate( sharkTrailPrefab );
 
       shark.transform.position  = blarp.transform.position - blarp.GetComponent<Rigidbody>().velocity.normalized;
 
