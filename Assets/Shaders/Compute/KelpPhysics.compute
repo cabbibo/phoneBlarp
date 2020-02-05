@@ -262,7 +262,7 @@ void Collision (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uin
 
     if( _Delta  < .1 && tb == false ){
 
-      float dampening =.9;//_Dampening;//.99999;// - vert.life * .01;
+      float dampening =.95;//_Dampening;//.99999;// - vert.life * .01;
       float3 next = vert.pos + vel  * dampening + force * .001;
 
       vert.oPos = vert.pos;

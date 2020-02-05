@@ -18,6 +18,7 @@ public int currHit;
 
     public Material wallMat;
 
+    public float wallWidth;
     public GameObject[] walls;
 
     public void MakeWalls(){
@@ -29,27 +30,27 @@ public int currHit;
       GameObject go;
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( screen.width /2 , 0 , 0 );
-        go.transform.localScale = new Vector3( .1f  , 10, screen.height );
+        go.transform.localScale = new Vector3( wallWidth  , 10, screen.height );
         walls[0] = go;
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( -screen.width /2, 0 , 0 );
-        go.transform.localScale = new Vector3( .1f  , 10 ,screen.height );
+        go.transform.localScale = new Vector3( wallWidth  , 10 ,screen.height );
         walls[1] = go;
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( 0 ,0 , screen.height/2 );
-        go.transform.localScale = new Vector3( screen.width , 10 ,.1f );
+        go.transform.localScale = new Vector3( screen.width , 10 ,wallWidth );
         walls[2] = go;
 
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( 0 , 0, -screen.height/2 );
-        go.transform.localScale = new Vector3( screen.width , 10,.1f  );
+        go.transform.localScale = new Vector3( screen.width , 10,wallWidth  );
         walls[3] = go;
 
 
         wallMat = go.GetComponent<Renderer>().sharedMaterial;
-        platform.transform.localScale =new Vector3( screen.width , 10, screen.height  ) * .1f; 
+        platform.transform.localScale = new Vector3( screen.width , 10, screen.height  ) * .1f; 
 
     }
 

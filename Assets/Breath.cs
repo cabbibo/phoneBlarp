@@ -45,8 +45,8 @@ public bool cooling;
 
       breathVal = Mathf.Clamp( breathVal , 0 , 1 );
 
-      transform.localScale = new Vector3(breathVal * game.screen.width, .3f  , .1f);
-      transform.position = new Vector3( 0, 3,-game.screen.height * .5f + .15f);
+      transform.localScale = new Vector3(breathVal * game.screen.width, .3f  , .5f);
+      transform.position = new Vector3( 0, 3,-game.screen.height * .5f + .25f);
     }
 
     public void TriggerCoolDown(){

@@ -13,13 +13,16 @@ public class Saveable {
 
   public static List<string> names = new List<string>();
   
+  
   public static string GetSafeName(){
 
     string fString = "entity"+ UnityEngine.Random.Range(0,10000000);
 
+
+    Debug.Log("NAME: " + fString );
     foreach( string s in names ){
-      if( fString == s){
-        fString = GetSafeName();
+      if( fString  == s){
+        fString = "entity"+ UnityEngine.Random.Range(0,10000000);//GetSafeName();
       }
     }
 
@@ -27,6 +30,7 @@ public class Saveable {
     return fString;
 
   }
+
 
 
   public static bool CheckIfAllNamesSafe(){
@@ -56,13 +60,14 @@ public class Saveable {
 
 
   public static string GetFullName( string name ){
-    return Application.streamingAssetsPath + "/DNA/"+name+".dna";
+    return Application.persistentDataPath+"/DNA/"+name+".dna";
   }
 
 
   public static void DeleteAll(){
 
-    string path = Application.streamingAssetsPath + "/DNA";
+    CheckDNA();
+    string path = Application.persistentDataPath + "/DNA";
 
 
     var hi = Directory.GetFiles(path);
@@ -87,6 +92,7 @@ public class Saveable {
 
   public static void Save( Form form){
 
+    CheckDNA();
     BinaryFormatter bf = new BinaryFormatter();
     FileStream stream = new FileStream(GetFullName(form.saveName),FileMode.Create);
 
@@ -101,7 +107,14 @@ public class Saveable {
     stream.Close();
   }
 
+  public static void CheckDNA(){
+    if(!Directory.Exists(Application.persistentDataPath + "/DNA")){    
+       //if it doesn't, create it
+      Directory.CreateDirectory(Application.persistentDataPath + "/DNA");
+    }
+  }
   public static void Load(Form form){
+    CheckDNA();
     if( File.Exists(GetFullName(form.saveName))){
       
       BinaryFormatter bf = new BinaryFormatter();
@@ -131,25 +144,34 @@ public class Saveable {
           }
         }
       }else{
-        float[] data = bf.Deserialize(stream) as float[];
-        if( data == null ){
-            form.DebugThis("YOUR  DATA IS NULL");
-            form.saveName = GetSafeName();
-            form.Embody();
-            form.loadedFromFile = false;
-            Saveable.Save(form);
-          }else{
-          if( data.Length != form.count * form.structSize ){
-            form.DebugThis("YOUR INPUT DATA IS OFF");
-            form.saveName = GetSafeName();
-            form.Embody();
-            form.loadedFromFile = false;
-            Saveable.Save(form);
+        if( stream.Length == 0 ){
+          form.DebugThis("Stream is empty");
+              form.saveName = GetSafeName();
+              form.Embody();
+              form.loadedFromFile = false;
+              Saveable.Save(form);
 
-          }else{
-            
-           // form.DebugThis("loadedFromFileee");
-            form.SetDNA(data);
+        }else{
+          float[] data = bf.Deserialize(stream) as float[];
+          if( data == null ){
+              form.DebugThis("YOUR  DATA IS NULL");
+              form.saveName = GetSafeName();
+              form.Embody();
+              form.loadedFromFile = false;
+              Saveable.Save(form);
+            }else{
+            if( data.Length != form.count * form.structSize ){
+              form.DebugThis("YOUR INPUT DATA IS OFF");
+              form.saveName = GetSafeName();
+              form.Embody();
+              form.loadedFromFile = false;
+              Saveable.Save(form);
+
+            }else{
+              
+             // form.DebugThis("loadedFromFileee");
+              form.SetDNA(data);
+            }
           }
         }
       }

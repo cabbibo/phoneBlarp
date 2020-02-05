@@ -19,9 +19,6 @@ public class TouchBlarp : Game
 
 
 
-    public GameObject sharkPrefab;
-    public GameObject sharkTrailPrefab;
-
     public LineRenderer touchLR;
 
     public bool holding;
@@ -59,13 +56,9 @@ public class TouchBlarp : Game
 
     public float currentMass;
 
-    public List<GameObject>sharks;
-    public List<GameObject>sharkTrails;
-    public List<LineRenderer>sharksLR;
-    public List<TrailRenderer>sharksTR;
-    public List<ParticleSystem>sharksPS;
-    public List<AudioSource>sharksAS;
-    public List<Rigidbody>sharksRB;
+    public GameObject shark;
+    public LineRenderer sharkLR;
+    public Rigidbody sharkRB;
 
     public float spawnTime;
 
@@ -90,11 +83,11 @@ public class TouchBlarp : Game
         curve.AddKey(1.0f, 0.8f);
 
 
-        blarpTrail.widthCurve = curve;
-        blarpTrail.widthMultiplier = 5.5f;
+        //blarpTrail.widthCurve = curve;
+        //blarpTrail.widthMultiplier = 5.5f;
 
-         sharkTrail.widthCurve = curve;
-        sharkTrail.widthMultiplier = 3.5f;
+        //sharkTrail.widthCurve = curve;
+        //sharkTrail.widthMultiplier = 3.5f;
 
 
     }
@@ -135,7 +128,7 @@ public class TouchBlarp : Game
 
             touchLR.SetPosition( 0 , blarp.transform.position + dif * .2f -Camera.main.transform.forward * upConnectionDist);
             touchLR.SetPosition( 1 , blarp.transform.position + dif * .5f -Camera.main.transform.forward * upConnectionDist);
-            touchLR.SetWidth(.06f, 0);
+            touchLR.SetWidth(.6f, 0);
 
             touchAudioSource.pitch  =  Mathf.Clamp( 4/(touch.transform.position - blarp.transform.position).magnitude,0 , 10);
             touchAudioSource.volume = Mathf.Lerp( touchAudioSource.volume , 1 , .5f );
@@ -161,29 +154,18 @@ public class TouchBlarp : Game
 
 
 
-            for( int i = 0; i< sharks.Count; i++ ){
 
-              sharksLR[i].SetPosition( 0 , sharks[i].transform.position-Camera.main.transform.forward * upConnectionDist);
-              sharksLR[i].SetPosition( 1 , blarp.transform.position-Camera.main.transform.forward * upConnectionDist);
-              float dist = (sharks[i].transform.position - blarp.transform.position).magnitude;
-              sharksRB[i].AddForce(Vector3.Scale((sharks[i].transform.position - blarp.transform.position),new Vector3(1,0,1)) * -.3f );
-              sharksAS[i].pitch  =  Mathf.Clamp( 4/dist,0 , 10);
-              sharksAS[i].volume = Mathf.Lerp( sharksAS[i].volume , 1 , .1f );
-              //Time.timeScale = Mathf.Clamp( dist / 6 ,  0.3f,  1 );
-              //print( dist);
-              sharkEmission = sharksPS[i].emission;
-              sharkEmission.rateOverTime = 1000/ (dist*dist*dist);
-
+              sharkLR.SetPosition( 0 , shark.transform.position-Camera.main.transform.forward * upConnectionDist);
+              sharkLR.SetPosition( 1 , blarp.transform.position-Camera.main.transform.forward * upConnectionDist);
+              float dist = (shark.transform.position - blarp.transform.position).magnitude;
+              sharkRB.AddForce(Vector3.Scale((shark.transform.position - blarp.transform.position),new Vector3(1,0,1)) * -.3f );
              
-              
-            }
-          }else{/*
+             
+      
+          }else{
             sharkLR.SetPosition( 0 , Vector3.zero);
             sharkLR.SetPosition( 1 , Vector3.zero);
 
-            sharkEmission = sharkParticles.emission;
-            sharkEmission.rateOverTime = 0;
-            sharkAudioSource.volume = Mathf.Lerp( sharkAudioSource.volume , 0 , .1f );*/
           }
 
 
@@ -216,17 +198,7 @@ public class TouchBlarp : Game
 
 
     public override void DoRestart(){
-    for( int i = 1; i < sharks.Count; i++ ){
-        Destroy( sharks[i] );
-        Destroy( sharkTrails[i] );
-      }
-      sharks.Clear();
-      sharkTrails.Clear();
-      sharksLR.Clear();
-      sharksTR.Clear();
-      sharksPS.Clear();
-      sharksAS.Clear();
-      sharksRB.Clear();
+
 
       blarpRigidBody.velocity = Vector3.zero;
       
@@ -236,11 +208,13 @@ public class TouchBlarp : Game
       blarp.transform.position = blarpStartingPosition;
       touch.transform.position = touchStartingPosition;
       target.transform.position = targetStartingPosition;
+      shark.transform.position = Vector3.one * 1000;
       TriggerGlitch();
       blarpHitSource.Play();
 
-      blarpTrail.time = .3f;
-      sharkTrail.time = .3f;
+      //blarpTrail.time = .3f;
+      //sharkTrail.time = .3f;
+      score = 0;
 
       UpdateTransformBuffer();
     }
@@ -263,9 +237,8 @@ public class TouchBlarp : Game
     public void UpdateTransformBuffer(){
       List<Transform> transforms = new List<Transform>();
       transforms.Add( blarp.transform );
-      foreach( GameObject shark in sharks ){
-        transforms.Add( shark.transform );
-      }
+      transforms.Add( shark.transform );
+
       transforms.Add( touch.transform );
       transforms.Add( target.transform );
       transformBuffer.Remake( transforms);
@@ -286,62 +259,44 @@ public class TouchBlarp : Game
         blarpRigidBody.mass = Mathf.Clamp(MASS(),0.00001f,1);
         currentMass= blarpRigidBody.mass;
           blarpTrail.time = .3f + (float)score / 20;
-          for(int i = 0; i < sharks.Count;i++ ){
-            sharksRB[i].mass = Mathf.Clamp(MASS(),0.00001f,1);
-            sharksTR[i].time = .3f + (float)score / 30;
-          }
+          sharkRB.mass = Mathf.Clamp(MASS(),0.00001f,1);
         targetHitSource.Play();
 
         MiniGlitch();
     }
 
     public void SpawnShark(){
-      GameObject shark = sharkPrefab;//Instantiate( sharkPrefab);
-      GameObject sharkTrail = sharkTrailPrefab;//Instantiate( sharkTrailPrefab );
+    
+      shark.transform.position  = blarp.transform.position - Vector3.forward * 3 -Camera.main.transform.forward;
+      sharkRB.velocity = Vector3.zero;
 
-      shark.transform.position  = blarp.transform.position - blarp.GetComponent<Rigidbody>().velocity.normalized;
-
-      sharkTrails.Add( sharkTrail );
-      sharks.Add(shark);
-      sharksLR.Add( sharkTrail.GetComponent<LineRenderer>() );
-      sharksTR.Add( sharkTrail.GetComponent<TrailRenderer>() );
-      sharksPS.Add( sharkTrail.GetComponent<ParticleSystem>() );
-      sharksRB.Add( shark.GetComponent<Rigidbody>() );
-      sharksAS.Add( shark.GetComponent<AudioSource>() );
-      sharkTrail.GetComponent<CopyPosition>().target = shark.transform;
-      sharkTrail.transform.parent = scene.transform;
-      shark.transform.parent = scene.transform;
-      sharkTrail.transform.localRotation = Quaternion.identity;
-      spawnTime = Time.time;
-
-      shark.GetComponent<Rigidbody>().mass = Mathf.Clamp(MASS(),0.00001f,1);
     }
 
     public void TriggerGlitch(){
-    glitch.glitchPow = 0;
+    /*glitch.glitchPow = 0;
     glitch.glitchStartTime = Time.time;
     glitch.enabled = true;
     float p = Random.Range( 0, .99f);
     glitch.glitchLength = 1.5f + p;
 
     glitch.glitchSize = .1f;
-    glitch.glitchAmount = 3.5f;
+    glitch.glitchAmount = 3.5f;*/
 
   }
 
 
   public void MiniGlitch(){
-    glitch.glitchPow = 0;
+   /* glitch.glitchPow = 0;
     glitch.glitchStartTime = Time.time;
     glitch.glitchSize = .2f + (float)score/40;
     glitch.glitchAmount = .1f+ (float)score/300;
     glitch.enabled = true;
     float p = Random.Range( 0, .99f);
-    glitch.glitchLength = .1f + p * .3f;
+    glitch.glitchLength = .1f + p * .3f;*/
   }
 
   public void EmitParticles( int count ){
-    targetHitParticles.Emit( count);
+    //targetHitParticles.Emit( count);
   }
 
 

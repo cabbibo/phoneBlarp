@@ -75,16 +75,16 @@ public int numFrames;
 
   public override void WhileLiving(float v){
 
-  numFrames += 1;
+ // numFrames += 1;
 
-  if( numFrames == 10 ){ Set(); Activate(); }    
+  //if( numFrames == 10 ){ Set(); Activate(); }    
     //set.active = false;
     transformArray = HELP.GetMatrixFloats( transform.localToWorldMatrix );
   }
 
 
   public override void OnBirthed(){
-  //  Set();
+    Set();
   }
   public void Set(){
    set.YOLO();

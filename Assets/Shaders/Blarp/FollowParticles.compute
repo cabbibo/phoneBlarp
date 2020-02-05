@@ -7,6 +7,7 @@
 
 
 float3 _Leader;
+int _Score;
 
 
 
@@ -36,17 +37,33 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
   //int pID = id.x + id.y * gridX + id.z * gridX * gridY;
 
   uint pID = threadID + u3GroupID.x * NR_THREADS;
-  if( pID < _VertBuffer_COUNT ){
+  if( pID < _VertBuffer_COUNT){
 
     pID = safeID( pID , _VertBuffer_COUNT );
     Vert vert = _VertBuffer[pID];
 
-    if( pID == 0 ){
-      vert.pos = lerp( vert.pos , _Leader , .1 );
+    if( pID <= _Score ){
+
+      float3 tPos;
+      if( pID == 0 ){
+        tPos = lerp( vert.pos , _Leader , .1 );
+      }else{
+        float3 up = _VertBuffer[ safeID(pID-1 , _VertBuffer_COUNT )].pos;
+
+        tPos = lerp( vert.pos , up , .1 );
+      }
+
+      if( length( tPos - vert.pos ) < 3 ){
+        vert.pos = tPos;
+
+      }else{
+        vert.pos = _Leader;
+      }
     }else{
-      float3 up = _VertBuffer[ safeID(pID-1 , _VertBuffer_COUNT )].pos;
-      vert.pos = lerp( vert.pos , up , .1 );
+      vert.pos = 10000;
     }
+
+
     _VertBuffer[pID] = vert;
 
 
