@@ -18,7 +18,7 @@ public class SetVelocity : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
       mat.SetVector("_Velocity", rb.velocity);
         

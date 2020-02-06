@@ -48,6 +48,7 @@
     uniform float _OutlineWidth;
     uniform float4 _OutlineColor;
     uniform sampler2D _MainTex;
+    uniform sampler2D _GlobalColorMap;
     uniform float4 _Color;
     uniform float3 _Velocity;
 
@@ -76,14 +77,14 @@
                 float2 dif = i.uv.xy - .5;
                 float a = atan2(dif.y , dif.x );
                 
-                float4 col = 1;
+                float4 col = 0;
                 if( l > .5 ){discard;}
                 if( l < .4 && l > .33 ){discard;}
                 if( sin(a * 8 -4* _Time.y) < 0 && l > .4 ){discard;}
                 if( l > .25 ){ col = 0; }
                 //if( l < .25){ discard; }
                 //sin(a * 10 + _Time.y * 10 );///3.14;
-                float4 s = tex2D( _MainTex,_Time.y * .3+ a/6.28);
+                float4 s = tex2D( _GlobalColorMap,_Time.y * .3+ a/6.28);
 
                 if( l > .4 ){ col = s; }
                 return col;

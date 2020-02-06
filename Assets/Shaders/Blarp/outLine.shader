@@ -85,6 +85,8 @@ LIGHTING_COORDS(5,6)
             float _Saturation;
             float _Brightness;
 
+            sampler2D _GlobalColorMap;
+
             v2f vert ( uint vid : SV_VertexID )
             {
                 v2f o;
@@ -127,7 +129,7 @@ LIGHTING_COORDS(5,6)
           
                 half3 worldViewDir = normalize(UnityWorldSpaceViewDir(v.world));
                 //half3 worldRefl = reflect(-worldViewDir, worldNormal);
-                half3 worldRefl = refract(worldViewDir, v.nor,.8);
+                half3 worldRefl = reflect(worldViewDir, worldNormal);
                 half4 skyData = UNITY_SAMPLE_TEXCUBE(unity_SpecCube0, worldRefl);
                 half3 skyColor = DecodeHDR (skyData, unity_SpecCube0_HDR);
 
@@ -184,11 +186,12 @@ float atten =UNITY_SHADOW_ATTENUATION(v,v.world);
 
 
 
-                fCol = tex2D(_ColorMap , -_Time.y + v.debug.x / 10);//tCol * s2;
+                fCol = tex2D(_GlobalColorMap , -_Time.y + v.debug.x / 10);//tCol * s2;
                 if( s3.a < .1){ discard; }
-                if( s3.a < .3){ fCol=0; }
+                fCol *= s3.a;//if( s3.a < .3){ fCol=0; }
                 //fCol = v.debug.x;
-                fixed4 col = float4(fCol,1);//fLCol;//float4( i.nor * .5 + .5 , 1);//tex2D(_MainTex, i.uv);
+                fixed4 col = 1;
+                col.xyz = tCol * fCol;//float4(fCol,1);//fLCol;//float4( i.nor * .5 + .5 , 1);//tex2D(_MainTex, i.uv);
                 return col;
             }
 

@@ -1,0 +1,64 @@
+﻿#pragma kernel ToTarget
+
+struct Vert{
+    float3 pos;
+    float3 vel;
+    float3 nor;
+    float3 tangent;
+    float2 uv;
+    float2 debug;
+};
+
+RWStructuredBuffer<Vert> _VertBuffer;
+
+int _VertBuffer_COUNT;
+
+float3 _TargetPos;
+float3 _BlarpPos;
+
+#include "../Chunks/hash.cginc"
+#include "../Chunks/snoise.cginc"
+#include "../Chunks/curlNoise.cginc"
+#include "../Chunks/safeID.cginc"
+#define NR_THREADS 128
+[numthreads(NR_THREADS,1,1)]
+void ToTarget (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
+
+    int pID = threadID + u3GroupID.x * NR_THREADS;
+
+  Vert v = _VertBuffer[ safeID(pID,_VertBuffer_COUNT)];
+
+  if( v.pos.x == 0 ){
+    v.pos.x = hash(float(pID)) * 100;
+    v.pos.y = hash(float(pID * 20)) * 100;
+    v.pos.z = hash(float(pID* 10)) * 100;
+
+  }
+
+  float3 tPos =  _TargetPos;
+
+  float3 force = 0;
+  force += (_TargetPos - v.pos - float3(0,2,0)) * .2;
+
+  if( length(_BlarpPos - v.pos) > 0 ){
+    force -=  4.1 * normalize(_BlarpPos - v.pos)/ pow(length(_BlarpPos - v.pos),10);
+  }
+
+  /*if( length(v.pos - _TargetPos) > 10  ){
+    v.pos = _TargetPos;
+
+        v.pos.x += hash(float(pID)) * .1;
+    v.pos.y += hash(float(pID * 20)) * .1;
+    v.pos.z += hash(float(pID* 10)) * .1;
+  }*/
+  force += curlNoise( v.pos  * 10 );
+  v.vel += (force * .001 * (3+sin(hash(float(pID*100)) * 200. * 6.28)));
+  v.pos += v.vel;
+  v.vel *= .97;
+  v.pos.y = max( v.pos.y , .5 );
+
+  _VertBuffer[ safeID(pID,_VertBuffer_COUNT)] = v;
+
+
+
+}

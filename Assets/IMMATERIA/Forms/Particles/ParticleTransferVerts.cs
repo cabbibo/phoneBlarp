@@ -7,10 +7,13 @@ public class ParticleTransferVerts: Form {
 
 
   public Particles particles;
+  public int countMultiplier = 1;
 
 
 
     public override void _Create(){
+
+      print("Creating here");
     
     if( particles == null ){particles = GetComponent<Particles>(); }
     SetStructSize();
@@ -26,7 +29,11 @@ public class ParticleTransferVerts: Form {
     // 0-1
     // |/|
     // 2-3
-    count = particles.count * 4;
+    count = particles.count * 4 * countMultiplier;
+  }
+
+  public override void OnBirthed(){
+    print(_buffer);
   }
 
   

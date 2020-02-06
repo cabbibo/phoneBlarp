@@ -49,6 +49,7 @@ ZFail keep
 
             sampler2D _MainTex;
             sampler2D _ColorMap;
+            sampler2D _GlobalColorMap;
       samplerCUBE _CubeMap;
 
 float _RiverPos;
@@ -152,7 +153,7 @@ float _RiverPos;
                float fHue = _HueStart;
                _HueStart+= saturate( length( v.vel ) * 10 );
                // if(v.worldPos.z < _RiverPos){_HueStart += .5;}
-                fixed4 col =  tex2D(_ColorMap,float2(v.uv.x  * .3+_HueStart + _Time.y * .1 * _Speed, 0));
+                fixed4 col =  tex2D(_GlobalColorMap,float2(v.uv.x  * .3+_HueStart + _Time.y * .1 * _Speed, 0));
                  col*= atten* tCol * 2;//tex2D(_MainTex,v.uv * 5);
                 //  col*=shadow;
 

@@ -14,6 +14,9 @@ public class Breath : MonoBehaviour
 public float coolDownTime;
 public float coolDownSpeed;
 public bool cooling;
+
+public float breathDownSpeed;
+public float breathUpSpeed;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,9 +30,9 @@ public bool cooling;
 
 
       if( !breathing ){
-        breathVal -= .01f;
+        breathVal -= breathDownSpeed;
       }else{
-        breathVal += .03f;
+        breathVal += breathUpSpeed;
       }
 
       if( breathVal < 0 && cooling == false){

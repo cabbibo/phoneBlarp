@@ -270,6 +270,9 @@ void Collision (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uin
 
     }
 
+    vert.debug.x =  _HairLength  * .5 + .5* hash( float(bID)) * 1.1 * _HairLength;//((sin(float(bID)*10000)+ _HairVariance) / _HairVariance ) * _HairLength;
+
+
     //vert.pos = base.pos +float3(0,1,0) * vert.uv.x;
     vert.debug.y = vert.debug.x;
     _VertBuffer[pID] = vert;

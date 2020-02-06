@@ -9,6 +9,12 @@ using IMMATERIA;
 public class TouchBlarp : Game
 {
 
+    public GameObject colorChangeTarget;
+    public GameObject tailGrower;
+    public GameObject grassGrower;
+
+    public Hair vectorHair;
+    public Aesthetics aesthetics;
     public GameObject scene;
 
     public GameObject blarp;
@@ -70,6 +76,7 @@ public class TouchBlarp : Game
         blarpStartingPosition = blarp.transform.position;
         touchStartingPosition = touch.transform.position;
         targetStartingPosition = target.transform.position;
+        sharkStartingPosition = new Vector3( 0 , 0 , -10);//shark.transform.position;
         blarpRigidBody = blarp.GetComponent<Rigidbody>();
 
         highScore =  PlayerPrefs.GetInt ("highScore");
@@ -175,24 +182,18 @@ public class TouchBlarp : Game
 //            sharkRigidBody.velocity = Vector3.zero;
 
             blarp.transform.position = blarpStartingPosition;
-            //shark.transform.position = sharkStartingPosition;
+            shark.transform.position = sharkStartingPosition;
             touch.transform.position = touchStartingPosition;
             target.transform.position = targetStartingPosition;
 
           }
 
 
-     if( glitch.glitchPow > 1 ){
-          if(glitch.enabled == true ){
-            glitch.enabled = false;
-
-          }
-        }
-
+     
     }
 
     public float MASS(){
-       return Mathf.Clamp( .3f - (float)score * .006f  , .05f , .3f);
+       return Mathf.Clamp( .3f - (float)score * .001f  , .05f , .3f);
     }
 
 
@@ -200,21 +201,21 @@ public class TouchBlarp : Game
     public override void DoRestart(){
 
 
-      blarpRigidBody.velocity = Vector3.zero;
+      //blarpRigidBody.velocity = Vector3.zero;
       
         blarpRigidBody.mass = 1;
 
 
-      blarp.transform.position = blarpStartingPosition;
+     // blarp.transform.position = blarpStartingPosition;
       touch.transform.position = touchStartingPosition;
       target.transform.position = targetStartingPosition;
-      shark.transform.position = Vector3.one * 1000;
+      shark.transform.position = sharkStartingPosition;
       TriggerGlitch();
       blarpHitSource.Play();
 
       //blarpTrail.time = .3f;
       //sharkTrail.time = .3f;
-      score = 0;
+      //score = 0;
 
       UpdateTransformBuffer();
     }
@@ -224,13 +225,14 @@ public class TouchBlarp : Game
     public override void DoStart(){
     
       startHitSource.Play();
-      blarpRigidBody.mass = Mathf.Clamp(MASS(),0.00001f,1);
+      blarpRigidBody.mass = Mathf.Clamp(.2f,0.00001f,1);
       haptics.TriggerSuccess();
       MiniGlitch();
 
       SpawnShark();
 
       UpdateTransformBuffer();
+    
     }
 
     public TransformBuffer transformBuffer;
@@ -255,14 +257,36 @@ public class TouchBlarp : Game
     }
 
     public override void DoNext(){
- 
-        blarpRigidBody.mass = Mathf.Clamp(MASS(),0.00001f,1);
+
+    
+
+        vectorHair.length = (float)score/30;
+      
+        blarpRigidBody.mass = .2f;//Mathf.Clamp(MASS(),0.00001f,1);
         currentMass= blarpRigidBody.mass;
           blarpTrail.time = .3f + (float)score / 20;
           sharkRB.mass = Mathf.Clamp(MASS(),0.00001f,1);
         targetHitSource.Play();
 
+        
+
         MiniGlitch();
+    }
+
+
+    public void SpawnColorChange(){
+      coloChangeTarget.
+    }
+
+    public void NewAesthetic(){
+      if( score % 5 == 0 ){ aesthetics.SetNewColorScheme(); }
+      
+    }
+
+    public void UpdateScore(){
+      scoreText.text = ""+score;
+      Shader.SetGlobalInt("_Score" , score );
+
     }
 
     public void SpawnShark(){

@@ -34,6 +34,7 @@
             };
 
             sampler2D _MainTex;
+            sampler2D _GlobalColorMap;
             float4 _MainTex_ST;
 
             uniform float4 _Hits[10];
@@ -68,7 +69,7 @@
                 col = 0;
                 col = float4(1,0,0,1);
                 col = float4(normalize(v.closest.xyz) ,1);//saturate( 10- length(v.closest) * 1 );
-                col = 4*tex2D(_MainTex,length(v.closest.xyz) * .1 - _Time.y )  * saturate(1-(_Time.y-v.closest.w)) / length(v.closest.xyz);
+                col = 4*tex2D(_GlobalColorMap,length(v.closest.xyz) * .1 - _Time.y )  * saturate(1-(_Time.y-v.closest.w)) / length(v.closest.xyz);
                 if(_Cooling == 1 ){
                     col = (sin( _Time.y  * 12 )+1) * float4(1,0,0,1);
                 }

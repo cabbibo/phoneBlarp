@@ -4,15 +4,22 @@ using UnityEngine;
 
 public class Aesthetics : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+
+    public int colorScheme;
+    public Texture2D[] colors;
+
+
+
+    public void SetNewColorScheme(){
+
+      colorScheme ++;
+      colorScheme %= colors.Length;
+      Shader.SetGlobalTexture("_GlobalColorMap", colors[colorScheme]);
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void Restart(){
+      colorScheme = -1;
+      SetNewColorScheme();
     }
 }

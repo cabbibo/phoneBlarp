@@ -36,15 +36,17 @@ void Forward(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
 
     int pID = threadID + u3GroupID.x * NR_THREADS;
 
-    int particleID = pID / 4;
+    int particleID = pID / 8;
 
 
     // particle
     Vert p = _SkeletonBuffer[safeID(particleID,_SkeletonBuffer_COUNT)];
     Vert v = _VertBuffer[safeID(pID,_VertBuffer_COUNT)];
 
-    int idInParticle = pID % 4;
-    int row = idInParticle / 2;
+    int idInParticle = pID % 8;
+    int first = idInParticle / 4;
+    int idInQuad = idInParticle % 4;
+    int row = idInQuad / 2;
     int col = pID % 2;
 
 
@@ -58,16 +60,25 @@ void Forward(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
 
     float3 l = upPos - p.pos;//normalize(cross(p.nor,float3(0,1,0)));
     float3 u = normalize(cross( normalize( l ) , _CameraForward ));//normalize(cross(p.nor,l));
-v.nor = normalize(l);
-    l = normalize( cross( u , _CameraForward));
-    l *= (float(col)-.5);
-    u *= (float(row)-.5);
 
 
+        v.nor = normalize(l);
+    if( first == 0 ){
+        l = normalize( cross( u , _CameraForward));
+        l *= (float(col)-.5);
+        u *= (float(row)-.5);
 
-    v.pos = p.pos + (l + u) *  _Radius * 10  * (1-float( particleID) / float(_SkeletonBuffer_COUNT));
+        v.pos = p.pos - _CameraForward * .1 + (l + u) *  _Radius * 3 * (1-float( particleID) / float(_SkeletonBuffer_COUNT));
 
-    if( particleID >= _Score){
+    }else{
+        //l = normalize( l);
+        l *= (float(col));
+        u *= (float(row)-.5);
+
+        v.pos = p.pos + l + u *  _Radius * 1 * (1-float( particleID) / float(_SkeletonBuffer_COUNT));
+    }
+
+    if( particleID-1 >= _Score ){
       v.pos = 1000;
     }
 

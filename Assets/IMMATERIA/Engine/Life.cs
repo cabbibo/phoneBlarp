@@ -116,8 +116,7 @@ public class Life : Cycle {
   public event SetValues OnSetValues;
 
   public override void _Create(){
-
-    DebugThis("Creatio");
+    
     DoCreate();
     boundForms = new Dictionary<string, Form>();
     boundInts = new Dictionary<string, int>();

@@ -35,6 +35,7 @@ public class Form : Cycle {
 
   public override void _Create(){
     if( mpb == null ){ mpb = new MaterialPropertyBlock(); }
+    print(mpb);
     DoCreate();
     SetStructSize();
     SetCount();
@@ -130,6 +131,9 @@ public class Form : Cycle {
   }
 
   public override void WhileDebug(){
+    if( mpb == null ){ mpb = new MaterialPropertyBlock(); }
+    print(_buffer);
+    print( mpb );
     mpb.SetBuffer("_VertBuffer", _buffer);
     mpb.SetInt("_Count",count);
     

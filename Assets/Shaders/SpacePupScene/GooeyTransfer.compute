@@ -1,0 +1,48 @@
+﻿#pragma kernel Transfer
+
+struct Vert{
+    float3 pos;
+    float3 vel;
+    float3 nor;
+    float3 tangent;
+    float2 uv;
+    float2 debug;
+};
+
+RWStructuredBuffer<Vert> _VertBuffer;
+RWStructuredBuffer<Vert> _SkeletonBuffer;
+
+int _VertBuffer_COUNT;
+int _SkeletonBuffer_COUNT;
+
+float4x4 _Transform;
+
+
+#include "../Chunks/safeID.cginc"
+#define NR_THREADS 128
+[numthreads(NR_THREADS,1,1)]
+void Transfer (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
+
+    int pID = threadID + u3GroupID.x * NR_THREADS;
+
+  Vert s = _SkeletonBuffer[ safeID(pID,_SkeletonBuffer_COUNT)];
+  Vert v = _VertBuffer[ safeID(pID,_VertBuffer_COUNT)];
+
+  float3 tPos = mul( _Transform ,float4(s.pos,1)).xyz;
+  v.nor = normalize(mul( _Transform ,float4(s.nor,0)).xyz);
+
+  float3 force = 0;
+  /*force += tPos - v.pos;
+
+  v.vel += force * .1;
+  v.pos += v.vel;
+  v.vel *= .9;*/
+
+  v.vel = tPos - v.pos;
+  v.pos = tPos;
+
+  _VertBuffer[ safeID(pID,_VertBuffer_COUNT)] = v;
+
+
+
+}

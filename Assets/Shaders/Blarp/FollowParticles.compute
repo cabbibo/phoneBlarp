@@ -60,7 +60,7 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
         vert.pos = _Leader;
       }
     }else{
-      vert.pos = 10000;
+      vert.pos = _Leader;
     }
 
 

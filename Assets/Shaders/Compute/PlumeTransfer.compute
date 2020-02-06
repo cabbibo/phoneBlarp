@@ -1,0 +1,105 @@
+﻿#pragma kernel Forward
+
+struct Vert{
+    float3 pos;
+    float3 vel;
+    float3 nor;
+    float3 tangent;
+    float2 uv;
+    float2 debug;
+};
+
+RWStructuredBuffer<Vert> _VertBuffer;
+RWStructuredBuffer<Vert> _SkeletonBuffer;
+RWStructuredBuffer<Vert> _ParentBuffer;
+
+int _VertBuffer_COUNT;
+int _SkeletonBuffer_COUNT;
+int _ParentBuffer_COUNT;
+#include "../Chunks/safeID.cginc"
+
+float3 _CameraLeft;
+
+
+float3 _CameraRight;
+float3 _CameraUp;
+float3 _CameraForward;
+float _Radius;
+
+
+float3 _Leader;
+int _Score;
+float _Time;
+int _PlumeSize;
+int _Depth;
+
+#define NR_THREADS 128
+[numthreads(NR_THREADS,1,1)]
+void Forward(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
+
+    int pID = threadID + u3GroupID.x * NR_THREADS;
+
+    int particleID = pID / 8;
+
+
+    // particle
+    Vert p = _SkeletonBuffer[safeID(particleID,_SkeletonBuffer_COUNT)];
+    Vert v = _VertBuffer[safeID(pID,_VertBuffer_COUNT)];
+
+    int idInParticle = pID % 8;
+    int parentID = particleID / _PlumeSize;
+
+    int first = idInParticle / 4;
+    int idInQuad = idInParticle % 4;
+    int row = idInQuad / 2;
+    int col = pID % 2;
+
+
+    float3 upPos;
+    upPos = _ParentBuffer[ safeID(parentID , _ParentBuffer_COUNT )].pos;
+  
+
+
+    float3 l = upPos - p.pos;//normalize(cross(p.nor,float3(0,1,0)));
+    float3 u = normalize(cross( normalize( l ) , _CameraForward ));//normalize(cross(p.nor,l));
+
+
+        v.nor = normalize(l);
+    if( first == 0 ){
+        l = normalize( cross( u , _CameraForward));
+        l *= (float(col)-.5);
+        u *= (float(row)-.5);
+
+        v.pos = p.pos - _CameraForward * .1 + (l + u) *  _Radius * 3;// * (1-float( particleID) / float(_SkeletonBuffer_COUNT));
+
+    }else{
+        //l = normalize( l);
+        l *= (float(col));
+        u *= (float(row)-.5);
+
+        v.pos = p.pos + l + u *  _Radius * 1;// * (1-float( particleID) / float(_SkeletonBuffer_COUNT));
+    }
+
+    if( (particleID / pow(_PlumeSize,_Depth+1) - 1) >= _Score){
+      v.pos = _ParentBuffer[0].pos;
+    }
+
+    v.uv = float2( float(row) , float(col) );
+    v.debug.x = particleID;
+    v.debug.y = particleID / pow(_PlumeSize,_Depth+1);
+    
+
+
+    
+
+
+
+
+    _VertBuffer[safeID(pID,_VertBuffer_COUNT)] = v;/*
+    _VertBuffer[safeID(pID,_VertBuffer_COUNT)].vel = p.vel;
+    _VertBuffer[safeID(pID,_VertBuffer_COUNT)].uv = fUV;
+    _VertBuffer[safeID(pID,_VertBuffer_COUNT)].nor = p.nor;
+    _VertBuffer[safeID(pID,_VertBuffer_COUNT)].debug = float2( particleID , p.debug.y );*/
+
+
+}

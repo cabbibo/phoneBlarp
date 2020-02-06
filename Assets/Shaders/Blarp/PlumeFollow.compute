@@ -50,7 +50,7 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
     float3 force;
 
     force = 0;
-    force -= (vert.pos - base.pos) * 1;
+    force -= (vert.pos - base.pos) * .1;
 
     for(int i = 0; i < _PlumeSize; i++ ){
 
@@ -63,7 +63,7 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
       float3 dif = oV.pos - vert.pos;
 
       if( length( dif ) > 0 ){
-        force -= normalize(dif) * .2;// * .00000001;
+        force -= normalize(dif) * .01;// * .00000001;
       }
         //if( oV.pos.x == vert.pos.x ){ vert.pos.x += hash( float(pID) ); }
       }
@@ -71,15 +71,27 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
 
     }
 
+
+   
     if( vert.pos.x == 0 ){
-      vert.pos.x = 100*hash( float(pID));
-      vert.pos.y = 100*hash( float(pID * 20));
-      vert.pos.z = 100*hash( float(pID * 100));
+      vert.pos.x = 10000;;//*hash( float(pID));
+      vert.pos.y = 10000;;//*hash( float(pID * 20));
+      vert.pos.z = 10000;;//*hash( float(pID * 100));
     }
 
-    vert.vel += force * .01;
+    vert.vel += force * .1;
     vert.pos += vert.vel;
     vert.vel *= .9;
+
+    if( length( _SkeletonBuffer[0].pos - vert.pos ) > 30 ){
+      vert.pos = _SkeletonBuffer[0].pos;
+
+      vert.pos.x += .1 * hash( float(pID));
+      vert.pos.y += .1 * hash( float(pID * 20));
+      vert.pos.z += .1 * hash( float(pID * 100));
+      vert.vel = 0;
+    }
+
 
 
     _VertBuffer[pID] = vert;

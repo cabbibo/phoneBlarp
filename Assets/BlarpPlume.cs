@@ -16,16 +16,21 @@ public class BlarpPlume : Cycle
     public Form plume;
     public Form subPlume;
 
+    public TransferLifeForm plumeBody;
+    public TransferLifeForm subPlumeBody;
+
     public override void Create(){
 
-      SafeInsert( plumeLife );
-      SafeInsert( subPlumeLife );
+
+      plume.count = trail.form.count * plumeSize;
+      subPlume.count = plume.count * subPlumeSize;
 
       SafeInsert( plume );
       SafeInsert( subPlume );
 
-      plume.count = trail.form.count * plumeSize;
-      subPlume.count = plume.count * subPlumeSize;
+      SafeInsert( plumeLife );
+      SafeInsert( subPlumeLife );
+
 
     }
 

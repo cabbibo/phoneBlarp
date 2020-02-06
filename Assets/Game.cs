@@ -56,6 +56,24 @@ public class Game : MonoBehaviour
         scoreText.text = ""+score;
 
         DoStart();
+
+        score ++;
+        scoreText.text = ""+score;
+
+        if (score > highScore){
+          highScore = score;
+      
+          highScoreText.text = ""+highScore;
+          PlayerPrefs.SetInt ("highScore", highScore);
+      
+        DoNewHighScore();
+        }else{
+
+      
+        DoNewScore();
+        }
+
+        DoNext();
       }else{
 
 

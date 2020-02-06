@@ -6,6 +6,7 @@
         _MainTex ("Texture", 2D) = "white" {}
         _OutlineColor ("Outline color", Color) = (0,0,0,1)
         _OutlineWidth ("Outlines width", Range (0.0, 2.0)) = 1.1
+    _CubeMap( "Cube Map" , Cube )  = "defaulttexture" {}
     }
 
     CGINCLUDE
@@ -143,6 +144,8 @@
     struct v2f
     {
         float4 pos : POSITION;
+        float3 nor : TEXCOORD0;
+        float3 eye : TEXCOORD1;
     };
          
          v2f vert(appdata v)
@@ -157,14 +160,23 @@
                 //v.vertex.xyz += _OutlineWidth * normalize(v.vertex.xyz);
 
                 v2f o;
+
+                o.nor = wNorm;
+                o.eye = world - _WorldSpaceCameraPos.xyz;
                 o.pos = mul(UNITY_MATRIX_VP,float4(world,1));//v.vertex);
                 return o;
 
             }
 
-            half4 frag(v2f i) : COLOR
+            samplerCUBE _CubeMap;
+            half4 frag(v2f v) : COLOR
             {
-                return 1;
+                float4 col = 1;
+
+                float3 refl = reflect( v.eye , -v.nor );
+                float3 tCol = texCUBE(_CubeMap, refl);
+                col.xyz =tCol;// normalize(v.nor) * .5 + .5;
+                return col;
             }
 
         ENDCG
