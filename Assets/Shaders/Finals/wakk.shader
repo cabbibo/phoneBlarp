@@ -31,6 +31,7 @@
                 UNITY_FOG_COORDS(1)
                 float4 pos : SV_POSITION;
                 float4 closest : TEXCOORD2;
+                float3 world : TEXCOORD3;
             };
 
             sampler2D _MainTex;
@@ -39,6 +40,10 @@
 
             uniform float4 _Hits[10];
             uniform int _Cooling;
+
+
+            uniform float3 _BlarpPos;
+            uniform float3 _SharkPos;
 
 
             v2f vert (appdata v)
@@ -56,6 +61,7 @@
                     }
                 }
 
+                o.world = world;
                 o.closest =  float4(world - _Hits[0].xyz , _Hits[0].w);// closest;
                 o.pos = mul(UNITY_MATRIX_VP,float4(world,1));//v.vertex);
                 return o;
@@ -73,6 +79,15 @@
                 if(_Cooling == 1 ){
                     col = (sin( _Time.y  * 12 )+1) * float4(1,0,0,1);
                 }
+
+                float2 xz;
+                float3 oCol;
+                xz = abs(_BlarpPos.xz - v.world.xz);
+                if( xz.y < .1 - v.uv.x * v.uv.x * .1 || xz.x < .1 - v.uv.y * v.uv.y * .1 ){ col = tex2D(_GlobalColorMap,min(xz.x,xz.y) * 1); }
+
+                xz = abs(_SharkPos.xz - v.world.xz);
+                if( xz.y < .1 - v.uv.x * v.uv.x * .1|| xz.x < .1 - v.uv.y * v.uv.y * .1){ col = tex2D(_GlobalColorMap,min(xz.x,xz.y) * 1 + .5); }
+
                 return col;
             }
             ENDCG

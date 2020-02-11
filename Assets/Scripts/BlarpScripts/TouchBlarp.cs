@@ -24,6 +24,10 @@ public class TouchBlarp : Game
     public Glitch glitch;
     public Breath breath;
 
+    public int tailGrowthModulus;
+    public int colorChangeModulus;
+
+
 
 
     public LineRenderer touchLR;
@@ -116,7 +120,7 @@ public class TouchBlarp : Game
 
 
       frame ++;
-      if( frame == 20){
+      if( frame ==1){
         DoStart();
         DoNewScore();
         DoRestart();
@@ -297,11 +301,11 @@ public class TouchBlarp : Game
 
 
         
-          if( score % 20 == 0 ){
+          if( score % colorChangeModulus == 0 ){
             SpawnColorChange();
           }
 
-          if( score % 9 == 0 ){
+          if( score % tailGrowthModulus == 0 ){
             SpawnTailChange();
           }
         

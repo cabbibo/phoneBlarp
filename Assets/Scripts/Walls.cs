@@ -36,6 +36,7 @@ public int currHit;
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( -screen.width /2, 0 , 0 );
         go.transform.localScale = new Vector3( wallWidth  , 10 ,screen.height );
+        go.transform.rotation = Quaternion.AngleAxis( 180 , Vector3.up);
         walls[1] = go;
 
         go = Instantiate( wallPrefab );
@@ -46,6 +47,7 @@ public int currHit;
         go = Instantiate( wallPrefab );
         go.transform.position = new Vector3( 0 , 0, -screen.height/2 );
         go.transform.localScale = new Vector3( screen.width , 10,wallWidth  );
+        go.transform.rotation = Quaternion.AngleAxis( 180 , Vector3.up);
         walls[3] = go;
 
 
