@@ -7,8 +7,12 @@ public class FollowTrail : Simulation
 {
 
   public Transform leader;
-  public Game game;
+  public TouchBlarp game;
   public TransferLifeForm transferForm;
+
+  public Transform target;
+
+
 
   public override void Create(){
     SafeInsert( transferForm );
@@ -17,7 +21,8 @@ public class FollowTrail : Simulation
   public override void Bind(){
 
     life.BindVector3( "_Leader" , ()=> leader.position );
-    life.BindInt( "_Score" , ()=> game.score );
+    life.BindVector3( "_Target" , ()=> target.position );
+    life.BindInt( "_Score" , ()=> game.tailSize );
 
     print( leader );
     print(transferForm );
@@ -26,7 +31,7 @@ public class FollowTrail : Simulation
 
 
     transferForm.transfer.BindVector3( "_Leader" , ()=> leader.position );
-    transferForm.transfer.BindInt( "_Score" , ()=> game.score );
+    transferForm.transfer.BindInt( "_Score" , ()=> game.tailSize );
 
 
   }

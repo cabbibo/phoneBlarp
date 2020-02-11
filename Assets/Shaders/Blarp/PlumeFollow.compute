@@ -64,8 +64,10 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
 
       if( length( dif ) > 0 ){
         force -= normalize(dif) * .01;// * .00000001;
-      }
+      }else{
+        force += float3(float(hash(pID)+ 10),float(hash(pID)* 20),float(hash(pID)* 30)) * .0001;
         //if( oV.pos.x == vert.pos.x ){ vert.pos.x += hash( float(pID) ); }
+      }
       }
 
 
@@ -74,10 +76,12 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
 
    
     if( vert.pos.x == 0 ){
-      vert.pos.x = 10000;;//*hash( float(pID));
-      vert.pos.y = 10000;;//*hash( float(pID * 20));
-      vert.pos.z = 10000;;//*hash( float(pID * 100));
+      vert.pos.x = 10*hash( float(pID));
+      vert.pos.y = 10*hash( float(pID * 20));
+      vert.pos.z = 10*hash( float(pID * 100));
     }
+
+    vert.pos.y = 1;
 
     vert.vel += force * .1;
     vert.pos += vert.vel;

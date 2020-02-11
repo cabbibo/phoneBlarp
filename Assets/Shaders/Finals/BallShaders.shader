@@ -18,6 +18,7 @@
     uniform float4 _OutlineColor;
     uniform sampler2D _MainTex;
     uniform float4 _Color;
+    uniform sampler2D _GlobalColorMap;
     uniform float3 _Velocity;
 
     ENDCG
@@ -173,9 +174,10 @@
             {
                 float4 col = 1;
 
+                float m = dot( normalize(v.eye) , - v.nor);
                 float3 refl = reflect( v.eye , -v.nor );
                 float3 tCol = texCUBE(_CubeMap, refl);
-                col.xyz =tCol;// normalize(v.nor) * .5 + .5;
+                col.xyz =tCol* 2 * tex2D(_GlobalColorMap,m * .4) * (1-m);// normalize(v.nor) * .5 + .5;
                 return col;
             }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorSchemeChanger : MonoBehaviour
+public class TailGrowerChanger : MonoBehaviour
 {
 
     public Collider collider;
@@ -12,7 +12,7 @@ public class ColorSchemeChanger : MonoBehaviour
     public float spawnTime;
     public float spawnLength;
 
-    public Renderer quad;// Material material;
+    private Material material;
 
     private float hitTime;
     public float startScale;
@@ -20,20 +20,23 @@ public class ColorSchemeChanger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        material = GetComponent<MeshRenderer>().material;
+        Shader.SetGlobalFloat("_TailGrowTime", Time.time);
     }
 
     // Update is called once per frame
     void Update()
     {
         
-
-        float v = (Time.time - spawnTime) / spawnLength;
+         float v = (Time.time - spawnTime) / spawnLength;
         if( v > 1 ){
           Despawn();
         }else{
 
           float dV = Mathf.Min( v * 10 , (1-v));
           transform.localScale = Vector3.one * dV * startScale;
+        }if( Time.time - spawnTime > spawnLength ){
+          Despawn();
         }
      
     }
@@ -45,8 +48,9 @@ public class ColorSchemeChanger : MonoBehaviour
     }
 
     public void OnHit(){
-      game.ColorChangeHit();
-       Despawn();
+      game.TailGrow();
+      Shader.SetGlobalFloat("_TailGrowTime", Time.time);
+      Despawn();
     }
 
 
@@ -62,7 +66,6 @@ public class ColorSchemeChanger : MonoBehaviour
         print( hit.point );
         transform.position = hit.point + Camera.main.transform.forward * -.2f;
         spawnTime = Time.time;
-        quad.material.SetTexture("_ColorMap", game.aesthetics.colors[(game.aesthetics.colorScheme+1)%game.aesthetics.colors.Length]);
       }
     }
 

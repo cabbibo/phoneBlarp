@@ -14,6 +14,7 @@ public class TouchBlarp : Game
     public GameObject grassGrower;
 
     public Hair vectorHair;
+    public Hair enemyHair;
     public Aesthetics aesthetics;
     public GameObject scene;
 
@@ -68,6 +69,8 @@ public class TouchBlarp : Game
 
     public float spawnTime;
 
+    public int tailSize;
+
     public override void OnAwake()
     {
 
@@ -100,9 +103,25 @@ public class TouchBlarp : Game
     }
 
 
+    private int frame;
+    void Start(){
+
+     frame = 0;
+    }
+
+
     
     void Update()
     {
+
+
+      frame ++;
+      if( frame == 20){
+        DoStart();
+        DoNewScore();
+        DoRestart();
+      }
+
 
           if(Input.GetMouseButtonDown(0)){
             if( !breath.cooling ) touchDown = true;
@@ -133,8 +152,8 @@ public class TouchBlarp : Game
             Vector3 dif = touch.transform.position - blarp.transform.position;
 
 
-            touchLR.SetPosition( 0 , blarp.transform.position + dif * .2f -Camera.main.transform.forward * upConnectionDist);
-            touchLR.SetPosition( 1 , blarp.transform.position + dif * .5f -Camera.main.transform.forward * upConnectionDist);
+            touchLR.SetPosition( 0 , blarp.transform.position + dif * .2f -Camera.main.transform.forward * upConnectionDist * 2);
+            touchLR.SetPosition( 1 , blarp.transform.position + dif * .5f -Camera.main.transform.forward * upConnectionDist * 2);
             touchLR.SetWidth(.6f, 0);
 
             touchAudioSource.pitch  =  Mathf.Clamp( 4/(touch.transform.position - blarp.transform.position).magnitude,0 , 10);
@@ -162,8 +181,8 @@ public class TouchBlarp : Game
 
 
 
-              sharkLR.SetPosition( 0 , shark.transform.position-Camera.main.transform.forward * upConnectionDist);
-              sharkLR.SetPosition( 1 , blarp.transform.position-Camera.main.transform.forward * upConnectionDist);
+              sharkLR.SetPosition( 0 , shark.transform.position-Camera.main.transform.forward * upConnectionDist * .1f);
+              sharkLR.SetPosition( 1 , blarp.transform.position-Camera.main.transform.forward * upConnectionDist * .1f);
               float dist = (shark.transform.position - blarp.transform.position).magnitude;
               sharkRB.AddForce(Vector3.Scale((shark.transform.position - blarp.transform.position),new Vector3(1,0,1)) * -.3f );
              
@@ -217,6 +236,9 @@ public class TouchBlarp : Game
       //sharkTrail.time = .3f;
       //score = 0;
 
+      tailGrower.GetComponent<TailGrowerChanger>().Despawn();
+      colorChangeTarget.GetComponent<ColorSchemeChanger>().Despawn();
+
       UpdateTransformBuffer();
     }
 
@@ -232,6 +254,10 @@ public class TouchBlarp : Game
       SpawnShark();
 
       UpdateTransformBuffer();
+
+      tailSize = 0;
+      aesthetics.Restart();
+     // aesthetics.SetNewColorScheme();
     
     }
 
@@ -260,7 +286,8 @@ public class TouchBlarp : Game
 
     
 
-        vectorHair.length = (float)score/30;
+        vectorHair.length = (float)score/100;
+        enemyHair.length = (float)score/100;
       
         blarpRigidBody.mass = .2f;//Mathf.Clamp(MASS(),0.00001f,1);
         currentMass= blarpRigidBody.mass;
@@ -268,24 +295,50 @@ public class TouchBlarp : Game
           sharkRB.mass = Mathf.Clamp(MASS(),0.00001f,1);
         targetHitSource.Play();
 
+
         
+          if( score % 20 == 0 ){
+            SpawnColorChange();
+          }
+
+          if( score % 9 == 0 ){
+            SpawnTailChange();
+          }
+        
+
+        UpdateScore();
 
         MiniGlitch();
     }
 
 
     public void SpawnColorChange(){
-      coloChangeTarget.
+      colorChangeTarget.GetComponent<ColorSchemeChanger>().OnSpawn();
     }
 
-    public void NewAesthetic(){
-      if( score % 5 == 0 ){ aesthetics.SetNewColorScheme(); }
-      
+
+    public void SpawnTailChange(){
+      tailGrower.GetComponent<TailGrowerChanger>().OnSpawn();
     }
 
+ 
+
+    public void ColorChangeHit(){
+      score += 5;
+      UpdateScore();
+      aesthetics.SetNewColorScheme();
+    }
     public void UpdateScore(){
       scoreText.text = ""+score;
       Shader.SetGlobalInt("_Score" , score );
+
+    }
+
+    public void TailGrow(){
+      tailSize ++;
+      Shader.SetGlobalInt("_TailSize" , score );
+      score += 3;
+      UpdateScore();
 
     }
 

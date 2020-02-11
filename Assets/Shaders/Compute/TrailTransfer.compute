@@ -82,8 +82,14 @@ void Forward(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
       v.pos = 1000;
     }
 
+    if( particleID == _Score && first == 1 ){
+        v.pos = 1000;
+
+    }
+
     v.uv = float2( float(row) , float(col) );
     v.debug.x = particleID;
+    v.debug.y = particleID;
     
 
 

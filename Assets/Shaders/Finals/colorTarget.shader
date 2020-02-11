@@ -1,9 +1,9 @@
-﻿Shader "Outlined/target"
+﻿Shader "Outlined/colorTarget"
 {
     Properties
     {
         _Color("Main Color", Color) = (0.5,0.5,0.5,1)
-        _MainTex ("Texture", 2D) = "white" {}
+        _ColorMap ("Texture", 2D) = "white" {}
         _OutlineColor ("Outline color", Color) = (0,0,0,1)
         _OutlineWidth ("Outlines width", Range (0.0, 2.0)) = 1.1
     }
@@ -48,7 +48,7 @@
     uniform float _OutlineWidth;
     uniform float4 _OutlineColor;
     uniform sampler2D _MainTex;
-    uniform sampler2D _GlobalColorMap;
+    uniform sampler2D _ColorMap;
     uniform float4 _Color;
     uniform float3 _Velocity;
 
@@ -70,24 +70,28 @@
 
             }
 
+            #include "../Chunks/noise.cginc"
+
             half4 frag(v2f i) : COLOR
             {
 
                 float l = length(i.uv.xy - .5);
                 float2 dif = i.uv.xy - .5;
                 float a = atan2(dif.y , dif.x );
+
+                l += noise( float3( dif.x , dif.y , _Time.y ) * 20 ) * .1;
                 
                 float4 col = 0;
                 if( l > .5 ){discard;}
-                if( l < .4 && l > .33 ){discard;}
-                if( sin(a * 8 -4* _Time.y) < 0 && l > .4 ){discard;}
-                if( l > .3 ){ col = 1; }
+                //if( sin(a * 8 -4* _Time.y) < 0 && l > .4 ){discard;}
+                if( l > .25 ){ col = 0; }
                 //if( l < .25){ discard; }
                 //sin(a * 10 + _Time.y * 10 );///3.14;
-                float4 s = 1;//tex2D( _GlobalColorMap,_Time.y * .3+ a/6.28);
+                float4 s = tex2D( _ColorMap,_Time.y * .3+ a/6.28);
 
+                s =  tex2D( _ColorMap,_Time.y * .3+ l);
+                col = s;
                 if( l > .4 ){ col = s; }
-                if( l < .48 && l > .42 ){ col = 0; }
                 return col;
             }
 

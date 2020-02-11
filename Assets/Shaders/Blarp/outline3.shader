@@ -1,4 +1,4 @@
-﻿Shader "blarp/FishMish"
+﻿Shader "blarp/FishMish3"
 {
         Properties {
 
@@ -68,7 +68,7 @@ LIGHTING_COORDS(5,6)
             StructuredBuffer<Vert> _VertBuffer;
             StructuredBuffer<int> _TriBuffer;
 
-            float _TailGrowTime;
+
            sampler2D _ColorMap;
             sampler2D _TextureMap;
             sampler2D _ShinyMap;
@@ -86,8 +86,8 @@ LIGHTING_COORDS(5,6)
             float _Brightness;
 
             sampler2D _GlobalColorMap;
-            int _TailSize;
 
+            int _Score;
             v2f vert ( uint vid : SV_VertexID )
             {
                 v2f o;
@@ -98,9 +98,10 @@ LIGHTING_COORDS(5,6)
                 o.world = v.pos;
                 o.debug = v.debug;
 
-                if( v.debug.y+0>= _TailSize ){
-                  o.pos = 0;
+                if( v.debug.x >= _Score ){
+                    o.pos = 0;
                 }
+
                  half3 wNormal = v.nor;
                 half3 wTangent = v.tan;
                 // compute bitangent from cross product of normal and tangent
@@ -116,6 +117,7 @@ LIGHTING_COORDS(5,6)
             UNITY_TRANSFER_SHADOW(o,o.world);
                 return o;
             }
+
 
             fixed4 frag (v2f v) : SV_Target
             {
@@ -189,19 +191,16 @@ float atten =UNITY_SHADOW_ATTENUATION(v,v.world);
                 fCol*= fLCol * 3;
 
 
-
-                fCol = tex2D(_GlobalColorMap ,0 + v.debug.y * .01 + sin( v.debug.x * 100000 ) * .04 );//tCol * s2;
-                if( s3.a < .1){ discard; }
-                fCol *= s3.a;//if( s3.a < .3){ fCol=0; }
+                
+                 m = 1-dot(normalize(_WorldSpaceCameraPos.xyz- v.world) ,v.nor);
 
 
-
+                fCol = tex2D(_GlobalColorMap , m ) * (m);//tCol * s2;
+                //if( s3.a < .01){ discard; }
+                //fCol *= pow((1-s3.a),2) *3;//if( s3.a < .3){ fCol=0; }
                 //fCol = v.debug.x;
                 fixed4 col = 1;
-                col.xyz = tCol * fCol * 3;//float4(fCol,1);//fLCol;//float4( i.nor * .5 + .5 , 1);//tex2D(_MainTex, i.uv);
-                
-                //col =  float(int(v.debug.y) % 2);// sin( v.debug.y );
-                col = lerp( 1 , col , saturate(  _Time.y-_TailGrowTime));
+                col.xyz = tCol * fCol;//float4(fCol,1);//fLCol;//float4( i.nor * .5 + .5 , 1);//tex2D(_MainTex, i.uv);
                 return col;
             }
 
