@@ -81,9 +81,18 @@ void Forward(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
     if( particleID-1 >= _Score ){
       v.pos = 1000;
     }
+    l = upPos - p.pos;//normalize(cross(p.nor,float3(0,1,0)));
+    u = normalize(cross( normalize( l ) , _CameraForward ));//normalize(cross(p.nor,l));
+
+    if( particleID-1 == _Score ){
+        l = normalize( cross( u , _CameraForward));
+        l *= (float(col)-.5);
+        u *= (float(row)-.5);
+      v.pos =  p.pos - _CameraForward * 5.1  + ( l + u ) * _Radius * 4; 
+    }
 
     if( particleID == _Score && first == 1 ){
-        v.pos = 1000;
+        //v.pos = 1000;
 
     }
 

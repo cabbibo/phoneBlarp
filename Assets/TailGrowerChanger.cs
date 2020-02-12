@@ -55,7 +55,7 @@ public class TailGrowerChanger : MonoBehaviour
 
 
     public void Despawn(){
-      transform.position = Vector3.one * 1000;
+      transform.position = Vector3.up * 11;
     }
 
     public void OnSpawn(){

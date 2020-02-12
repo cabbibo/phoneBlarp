@@ -16,6 +16,8 @@ int _VertBuffer_COUNT;
 float3 _TargetPos;
 float3 _BlarpPos;
 
+int _IsSpawned;
+
 #include "../Chunks/hash.cginc"
 #include "../Chunks/snoise.cginc"
 #include "../Chunks/curlNoise.cginc"
@@ -38,7 +40,13 @@ void ToTarget (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
   float3 tPos =  _TargetPos;
 
   float3 force = 0;
-  force += (_TargetPos - v.pos - float3(0,2,0)) * .2;
+  if( _IsSpawned == 1 ){ 
+    force += (_TargetPos - v.pos - float3(0,2,0)) * .2; 
+  }else{
+    if( length(_BlarpPos - v.pos) > 0 ){
+      force +=  1.1 * normalize(_BlarpPos - v.pos);/// pow(length(_BlarpPos - v.pos),10);
+    }
+  }
 
   if( length(_BlarpPos - v.pos) > 0 ){
     force -=  4.1 * normalize(_BlarpPos - v.pos)/ pow(length(_BlarpPos - v.pos),10);

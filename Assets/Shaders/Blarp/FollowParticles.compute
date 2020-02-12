@@ -37,7 +37,7 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
 
   //int pID = id.x + id.y * gridX + id.z * gridX * gridY;
 
-  uint pID = threadID + u3GroupID.x * NR_THREADS;
+  int pID = threadID + u3GroupID.x * NR_THREADS;
   if( pID < _VertBuffer_COUNT){
 
     pID = safeID( pID , _VertBuffer_COUNT );
@@ -53,15 +53,17 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
         tPos = lerp( vert.pos , up , .1 );
       }
 
-      if( length( tPos - vert.pos ) < 3 ){
-        vert.pos = tPos;
+      vert.pos = tPos;
 
+
+      /*if( length( tPos - vert.pos ) < 300 ){
+        vert.pos = tPos;
       }else{
-        vert.pos = _Leader;
-      }
+        //vert.pos = _Target;
+      }*/
     }else{
+      vert.pos = _Target;
       //vert.pos = _Target;
-      vert.pos = _Leader;
     }
 
 

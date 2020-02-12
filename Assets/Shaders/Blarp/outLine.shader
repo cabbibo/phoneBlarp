@@ -98,8 +98,8 @@ LIGHTING_COORDS(5,6)
                 o.world = v.pos;
                 o.debug = v.debug;
 
-                if( v.debug.y+0>= _TailSize ){
-                  o.pos = 0;
+                if( v.debug.y-3>= _TailSize ){
+                 // o.pos = 0;
                 }
                  half3 wNormal = v.nor;
                 half3 wTangent = v.tan;

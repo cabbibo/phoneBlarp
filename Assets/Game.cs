@@ -10,7 +10,7 @@ public class Game : MonoBehaviour
     public Walls walls;
     
 
-     public int score;
+    public int score;
     public TextMesh scoreText;
     public TextMesh highScoreText;
     public TextMesh lastScoreText;
@@ -18,6 +18,9 @@ public class Game : MonoBehaviour
     public bool playing;
     public bool inMenu;
     public bool touchDown;
+
+    public Transform socialButtons;
+    public Transform title;
 
     public GameObject menu;
 
@@ -38,6 +41,7 @@ public class Game : MonoBehaviour
       screen.SetScreenSize();
       walls.screen = screen;
       walls.MakeWalls();
+      SetUpMenu();
       OnAwake();
 
     }
@@ -52,6 +56,7 @@ public class Game : MonoBehaviour
         playing = true;
         menu.SetActive(false);//.gameObject.GetComponent<Renderer>().enabled = false;
         
+        scoreText.gameObject.SetActive(true);
         score = 0;
         scoreText.text = ""+score;
 
@@ -63,7 +68,7 @@ public class Game : MonoBehaviour
         if (score > highScore){
           highScore = score;
       
-          highScoreText.text = ""+highScore;
+          highScoreText.text = "high : "+highScore;
           PlayerPrefs.SetInt ("highScore", highScore);
       
         DoNewHighScore();
@@ -104,15 +109,15 @@ public class Game : MonoBehaviour
 
     public virtual void Restart(){
 
-
-      lastScoreText.text = ""+score;
+      scoreText.gameObject.SetActive(false);//.enabled = false;
+      lastScoreText.text = "last : "+score;
       menu.SetActive(true);
 
       if( score == highScore && score >= 20){
         AskForRating();
       }
 
-      highScoreText.text = ""+highScore;
+      highScoreText.text = "high : "+highScore;
 
       playing = false;
       inMenu = true;
@@ -122,6 +127,14 @@ public class Game : MonoBehaviour
       DoRestart();
 
 
+
+
+    }
+
+    public void SetUpMenu(){
+      scoreText.transform.position = new Vector3( -screen.width * .4f ,  1 , screen.height * .45f );
+      socialButtons.position = new Vector3( screen.width * .4f ,  1 , -screen.height * .45f );
+      title.position = new Vector3( -screen.width * .4f , 1, screen.height * .45f  );
     }
     public virtual void DoRestart(){}
 

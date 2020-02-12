@@ -80,7 +80,7 @@ void Forward(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
         v.pos = p.pos + l + u *  _Radius * 1;// * (1-float( particleID) / float(_SkeletonBuffer_COUNT));
     }
 
-    if( (particleID / pow(_PlumeSize,_Depth+1) - 1) >= _Score){
+    if( int(float( (particleID / pow(_PlumeSize,_Depth+1) )) * (2+2*_Depth)) >= _Score){
       v.pos = _ParentBuffer[0].pos;
     }
 

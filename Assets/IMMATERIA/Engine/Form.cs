@@ -35,7 +35,7 @@ public class Form : Cycle {
 
   public override void _Create(){
     if( mpb == null ){ mpb = new MaterialPropertyBlock(); }
-    print(mpb);
+    //print(mpb);
     DoCreate();
     SetStructSize();
     SetCount();

@@ -21,7 +21,7 @@ public class AudioPlayer : Cycle{
     public override void Create(){
 
         if( objects != null ){
-            print("not null");
+//            print("not null");
             for( int i = 0; i < objects.Length; i++ ){
                 Object.DestroyImmediate(objects[i]);//.Destroy();
             }

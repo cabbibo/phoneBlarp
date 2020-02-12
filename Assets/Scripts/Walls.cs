@@ -67,14 +67,14 @@ public int currHit;
 
 public void SetWallCollision(Vector3 location){
 
-  print( location );
+//  print( location );
   currHit += 1;
   currHit %= hits.Length;
   hits[0] = new Vector4( location.x , location.y , location.z , Time.time );
 
   wallMat.SetVectorArray( "_Hits" , hits );
 
-  print("hi");
+//  print("hi");
 
 
 }

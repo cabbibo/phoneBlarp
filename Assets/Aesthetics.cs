@@ -34,7 +34,7 @@ public class Aesthetics : MonoBehaviour
       Shader.SetGlobalFloat("_ColorMapLerpVal", changeLerpVal);
       location = game.blarp.transform.position;
 
-      growthRenderer.material.SetVector( "_ChangeLocation" , game.colorChangeTarget.transform.position);
+      growthRenderer.sharedMaterial.SetVector( "_ChangeLocation" , game.colorChangeTarget.transform.position);
       growthRenderer.enabled = true;
       changing = true;
 

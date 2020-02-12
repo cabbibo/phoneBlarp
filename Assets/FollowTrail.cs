@@ -24,10 +24,10 @@ public class FollowTrail : Simulation
     life.BindVector3( "_Target" , ()=> target.position );
     life.BindInt( "_Score" , ()=> game.tailSize );
 
-    print( leader );
-    print(transferForm );
-    print( life );
-    print( transferForm.transfer );
+    //print( leader );
+    //print(transferForm );
+    //print( life );
+    //print( transferForm.transfer );
 
 
     transferForm.transfer.BindVector3( "_Leader" , ()=> leader.position );

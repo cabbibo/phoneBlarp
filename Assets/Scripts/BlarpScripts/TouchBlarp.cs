@@ -10,8 +10,10 @@ public class TouchBlarp : Game
 {
 
     public GameObject colorChangeTarget;
-    public GameObject tailGrower;
+    public GameObject tailGrowTarget;
     public GameObject grassGrower;
+
+    public TubeTransfer enemyHairBody;
 
     public Hair vectorHair;
     public Hair enemyHair;
@@ -21,6 +23,7 @@ public class TouchBlarp : Game
     public GameObject blarp;
     public GameObject touch;
     public GameObject target;
+    public TargetInfo targetInfo;
     public Glitch glitch;
     public Breath breath;
 
@@ -75,6 +78,60 @@ public class TouchBlarp : Game
 
     public int tailSize;
 
+    public Transform highScoreTransform;
+
+    public float sharkStartMass;
+    public float sharkMinMass;
+    public int sharkMinMassScore;
+
+
+    public float blarpStartMass;
+    public float blarpMinMass;
+    public int blarpMinMassScore;
+
+    public float startTargetLength;
+    public float minTargetLength;
+    public int minTargetLengthScore;
+
+     public float startTargetRespawnSpeed;
+    public float minTargetRespawnSpeed;
+    public int minTargetRespawnSpeedScore;
+
+
+
+    public float targetLength(){
+      float v1 = startTargetLength - minTargetLength;
+      float v2 =  (float)score/(float) minTargetLengthScore;
+      float fMass = startTargetLength - v1 * v2;
+      fMass = Mathf.Clamp(fMass , minTargetLength, startTargetLength );
+      return fMass;
+    }
+
+     public float targetRespawnSpeed(){
+      float v1 = startTargetRespawnSpeed - minTargetRespawnSpeed;
+      float v2 =  (float)score/(float) minTargetRespawnSpeedScore;
+      float fMass = startTargetRespawnSpeed - v1 * v2;
+      fMass = Mathf.Clamp(fMass , minTargetRespawnSpeed, startTargetRespawnSpeed );
+      return fMass;
+    }
+
+    public float BlarpMass(){
+      float v1 = blarpStartMass - blarpMinMass;
+      float v2 =  (float)score/(float)blarpMinMassScore;
+      float fMass = blarpStartMass - v1 * v2;
+      fMass = Mathf.Clamp(fMass , blarpMinMass , blarpStartMass );
+      return fMass;
+    }
+
+    public float SharkMass(){
+      float v1 = sharkStartMass - sharkMinMass;
+      float v2 =  (float)score/(float)sharkMinMassScore;
+      float fMass = sharkStartMass - v1 * v2;
+      fMass = Mathf.Clamp(fMass , sharkMinMass , sharkStartMass );
+      return fMass;
+    }
+
+
     public override void OnAwake()
     {
 
@@ -82,8 +139,8 @@ public class TouchBlarp : Game
 
         blarpStartingPosition = blarp.transform.position;
         touchStartingPosition = touch.transform.position;
-        targetStartingPosition = target.transform.position;
-        sharkStartingPosition = new Vector3( 0 , 0 , -10);//shark.transform.position;
+        //targetStartingPosition = target.transform.position;
+        sharkStartingPosition = new Vector3( 100 , 0 , -100);//shark.transform.position;
         blarpRigidBody = blarp.GetComponent<Rigidbody>();
 
         highScore =  PlayerPrefs.GetInt ("highScore");
@@ -167,7 +224,7 @@ public class TouchBlarp : Game
 
             if( breath.cooling == false ){ breath.breathing = true; }
             
-            touch.transform.position = Vector3.one * 1000;
+            touch.transform.position = Vector3.up * 11;
           
             touchLR.SetPosition( 0 , Vector3.zero );
             touchLR.SetPosition( 1 , Vector3.zero );
@@ -201,13 +258,14 @@ public class TouchBlarp : Game
 
           if( inMenu ){
 
-            blarpRigidBody.velocity = Vector3.zero;
+            //blarpRigidBody.velocity = Vector3.zero;
 //            sharkRigidBody.velocity = Vector3.zero;
 
-            blarp.transform.position = blarpStartingPosition;
+            //blarp.transform.position = blarpStartingPosition;
             shark.transform.position = sharkStartingPosition;
+            sharkRB.velocity = Vector3.zero;
             touch.transform.position = touchStartingPosition;
-            target.transform.position = targetStartingPosition;
+            //target.transform.position = targetStartingPosition;
 
           }
 
@@ -215,23 +273,29 @@ public class TouchBlarp : Game
      
     }
 
-    public float MASS(){
-       return Mathf.Clamp( .3f - (float)score * .001f  , .05f , .3f);
-    }
 
 
+    //Mathf.Clamp( .3f - (float)score * .001f  , .05f , .3f);
+    
 
     public override void DoRestart(){
 
 
       //blarpRigidBody.velocity = Vector3.zero;
       
-        blarpRigidBody.mass = 1;
+        blarpRigidBody.mass = blarpStartMass;
+        sharkRB.useGravity = false;
+        enemyHairBody.showBody = false;
 
+       // highScoreTransform.position = blarp.transform.position;
 
      // blarp.transform.position = blarpStartingPosition;
       touch.transform.position = touchStartingPosition;
-      target.transform.position = targetStartingPosition;
+      //target.transform.position = targetStartingPosition;
+      targetInfo.Restart();
+
+      targetInfo.spawnLength = startTargetLength;
+      targetInfo.timeBetweenSpawns = startTargetRespawnSpeed;
       shark.transform.position = sharkStartingPosition;
       TriggerGlitch();
       blarpHitSource.Play();
@@ -240,7 +304,7 @@ public class TouchBlarp : Game
       //sharkTrail.time = .3f;
       //score = 0;
 
-      tailGrower.GetComponent<TailGrowerChanger>().Despawn();
+      tailGrowTarget.GetComponent<TailGrowerChanger>().Despawn();
       colorChangeTarget.GetComponent<ColorSchemeChanger>().Despawn();
 
       UpdateTransformBuffer();
@@ -249,9 +313,12 @@ public class TouchBlarp : Game
    
 
     public override void DoStart(){
-    
+
+      targetInfo.spawnLength = targetLength();
+      targetInfo.timeBetweenSpawns = targetRespawnSpeed();
+      sharkRB.useGravity = true;
       startHitSource.Play();
-      blarpRigidBody.mass = Mathf.Clamp(.2f,0.00001f,1);
+      blarpRigidBody.mass = BlarpMass();//Mathf.Clamp(.2f,0.00001f,1);
       haptics.TriggerSuccess();
       MiniGlitch();
 
@@ -273,6 +340,8 @@ public class TouchBlarp : Game
 
       transforms.Add( touch.transform );
       transforms.Add( target.transform );
+      transforms.Add( colorChangeTarget.transform );
+      transforms.Add( tailGrowTarget.transform );
       transformBuffer.Remake( transforms);
     }
 
@@ -290,17 +359,21 @@ public class TouchBlarp : Game
 
     
 
+      targetInfo.spawnLength = targetLength();
+      targetInfo.timeBetweenSpawns = targetRespawnSpeed();
         vectorHair.length = (float)score/100;
         enemyHair.length = (float)score/100;
       
-        blarpRigidBody.mass = .2f;//Mathf.Clamp(MASS(),0.00001f,1);
+        blarpRigidBody.mass = BlarpMass();//.2f;//Mathf.Clamp(MASS(),0.00001f,1);
         currentMass= blarpRigidBody.mass;
           blarpTrail.time = .3f + (float)score / 20;
-          sharkRB.mass = Mathf.Clamp(MASS(),0.00001f,1);
+          sharkRB.mass = SharkMass();//Mathf.Clamp(MASS(),0.00001f,1);
+
         targetHitSource.Play();
 
 
         
+        if( score >= 10 ){ enemyHairBody.showBody = true; }
           if( score % colorChangeModulus == 0 ){
             SpawnColorChange();
           }
@@ -322,7 +395,7 @@ public class TouchBlarp : Game
 
 
     public void SpawnTailChange(){
-      tailGrower.GetComponent<TailGrowerChanger>().OnSpawn();
+      tailGrowTarget.GetComponent<TailGrowerChanger>().OnSpawn();
     }
 
  
@@ -333,6 +406,7 @@ public class TouchBlarp : Game
       aesthetics.SetNewColorScheme();
     }
     public void UpdateScore(){
+
       scoreText.text = ""+score;
       Shader.SetGlobalInt("_Score" , score );
 
@@ -348,7 +422,7 @@ public class TouchBlarp : Game
 
     public void SpawnShark(){
     
-      shark.transform.position  = blarp.transform.position - Vector3.forward * 3 -Camera.main.transform.forward;
+      shark.transform.position  = blarp.transform.position - blarpRigidBody.velocity.normalized * 3;// -Camera.main.transform.forward;
       sharkRB.velocity = Vector3.zero;
 
     }

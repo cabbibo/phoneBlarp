@@ -13,7 +13,7 @@ public class ParticleTransferVerts: Form {
 
     public override void _Create(){
 
-      print("Creating here");
+      //print("Creating here");
     
     if( particles == null ){particles = GetComponent<Particles>(); }
     SetStructSize();
@@ -33,7 +33,7 @@ public class ParticleTransferVerts: Form {
   }
 
   public override void OnBirthed(){
-    print(_buffer);
+//    print(_buffer);
   }
 
   
