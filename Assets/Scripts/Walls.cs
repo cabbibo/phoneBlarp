@@ -5,6 +5,7 @@ using UnityEngine;
 public class Walls : MonoBehaviour
 {
 
+  public Game game;
 
     public GameObject wallPrefab;
     public GameObject platform;
@@ -65,7 +66,7 @@ public int currHit;
     }
 
 
-public void SetWallCollision(Vector3 location){
+public void SetWallCollision(Vector3 location,float magnitude){
 
 //  print( location );
   currHit += 1;
@@ -75,6 +76,8 @@ public void SetWallCollision(Vector3 location){
   wallMat.SetVectorArray( "_Hits" , hits );
 
 //  print("hi");
+
+  game.DoWallHit(magnitude);
 
 
 }

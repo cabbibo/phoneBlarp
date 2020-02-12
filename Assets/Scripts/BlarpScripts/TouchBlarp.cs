@@ -8,6 +8,7 @@ using IMMATERIA;
 [ExecuteAlways]
 public class TouchBlarp : Game
 {
+    public Audio audio;
 
     public GameObject colorChangeTarget;
     public GameObject tailGrowTarget;
@@ -204,6 +205,7 @@ public class TouchBlarp : Game
                
                 blarpRigidBody.AddForce(Vector3.Scale((hit.point - blarp.transform.position),new Vector3(1,0,1)) * 1 );
               
+                audio.PlayTouchSound(Input.mousePosition);
 
 
               }
@@ -213,12 +215,7 @@ public class TouchBlarp : Game
             Vector3 dif = touch.transform.position - blarp.transform.position;
 
 
-            touchLR.SetPosition( 0 , blarp.transform.position + dif * .2f -Camera.main.transform.forward * upConnectionDist * 2);
-            touchLR.SetPosition( 1 , blarp.transform.position + dif * .5f -Camera.main.transform.forward * upConnectionDist * 2);
-            touchLR.SetWidth(.6f, 0);
-
-            touchAudioSource.pitch  =  Mathf.Clamp( 4/(touch.transform.position - blarp.transform.position).magnitude,0 , 10);
-            touchAudioSource.volume = Mathf.Lerp( touchAudioSource.volume , 1 , .5f );
+            
 
           }else{ 
 
@@ -229,11 +226,13 @@ public class TouchBlarp : Game
             touchLR.SetPosition( 0 , Vector3.zero );
             touchLR.SetPosition( 1 , Vector3.zero );
 
-            touchAudioSource.volume = Mathf.Lerp( touchAudioSource.volume , 0 , .1f );
+           
 
 
 
           }
+
+
 
 
           // Pull towards blarp
@@ -246,6 +245,8 @@ public class TouchBlarp : Game
               sharkLR.SetPosition( 1 , blarp.transform.position-Camera.main.transform.forward * upConnectionDist * .1f);
               float dist = (shark.transform.position - blarp.transform.position).magnitude;
               sharkRB.AddForce(Vector3.Scale((shark.transform.position - blarp.transform.position),new Vector3(1,0,1)) * -.3f );
+             
+
              
              
       
@@ -298,7 +299,8 @@ public class TouchBlarp : Game
       targetInfo.timeBetweenSpawns = startTargetRespawnSpeed;
       shark.transform.position = sharkStartingPosition;
       TriggerGlitch();
-      blarpHitSource.Play();
+
+      audio.PlayRestart();
 
       //blarpTrail.time = .3f;
       //sharkTrail.time = .3f;
@@ -317,7 +319,6 @@ public class TouchBlarp : Game
       targetInfo.spawnLength = targetLength();
       targetInfo.timeBetweenSpawns = targetRespawnSpeed();
       sharkRB.useGravity = true;
-      startHitSource.Play();
       blarpRigidBody.mass = BlarpMass();//Mathf.Clamp(.2f,0.00001f,1);
       haptics.TriggerSuccess();
       MiniGlitch();
@@ -328,6 +329,8 @@ public class TouchBlarp : Game
 
       tailSize = 0;
       aesthetics.Restart();
+
+      audio.PlayStart();
      // aesthetics.SetNewColorScheme();
     
     }
@@ -347,12 +350,16 @@ public class TouchBlarp : Game
 
     public override void DoNewHighScore(){
       haptics.TriggerImpactHeavy();
-      EmitParticles( 300 );
+      audio.PlayHighScore();
     }
 
     public override void DoNewScore(){
       haptics.TriggerImpactLight();
-      EmitParticles( 100 );
+        audio.PlayTargetHit();
+    }
+
+    public override void DoWallHit( float magnitude ){
+      audio.DoWallHit(magnitude);
     }
 
     public override void DoNext(){
@@ -369,7 +376,6 @@ public class TouchBlarp : Game
           blarpTrail.time = .3f + (float)score / 20;
           sharkRB.mass = SharkMass();//Mathf.Clamp(MASS(),0.00001f,1);
 
-        targetHitSource.Play();
 
 
         
@@ -404,6 +410,7 @@ public class TouchBlarp : Game
       score += 5;
       UpdateScore();
       aesthetics.SetNewColorScheme();
+      audio.PlayColorTargetHit();
     }
     public void UpdateScore(){
 
@@ -415,8 +422,7 @@ public class TouchBlarp : Game
     public void TailGrow(){
       tailSize ++;
       Shader.SetGlobalInt("_TailSize" , score );
-      score += 3;
-      UpdateScore();
+      audio.PlayTailTargetHit();
 
     }
 

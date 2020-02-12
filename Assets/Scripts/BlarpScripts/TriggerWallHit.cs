@@ -7,6 +7,6 @@ public class TriggerWallHit : MonoBehaviour
     public Game game;
     
     public void OnCollisionEnter( Collision c){
-      game.walls.SetWallCollision( c.contacts[0].point );
+      game.walls.SetWallCollision( c.contacts[0].point , c.relativeVelocity.magnitude );
     }
 }

@@ -29,6 +29,8 @@ float3 _Leader;
 int _Score;
 float _Time;
 
+float _ScaleLerpVal;
+
 
 #define NR_THREADS 128
 [numthreads(NR_THREADS,1,1)]
@@ -88,7 +90,7 @@ void Forward(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
         l = normalize( cross( u , _CameraForward));
         l *= (float(col)-.5);
         u *= (float(row)-.5);
-      v.pos =  p.pos - _CameraForward * 5.1  + ( l + u ) * _Radius * 4; 
+      v.pos =  p.pos - _CameraForward * 5.1  + ( l + u ) * _Radius * 10 * _ScaleLerpVal; 
     }
 
     if( particleID == _Score && first == 1 ){

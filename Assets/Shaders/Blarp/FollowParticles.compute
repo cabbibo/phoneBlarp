@@ -27,6 +27,7 @@ RWStructuredBuffer<Vert> _VertBuffer;
 
 uint _VertBuffer_COUNT;
 
+float _ScaleLerpVal;
 
 #include "../Chunks/safeID.cginc"
 
@@ -63,6 +64,7 @@ void Follow(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID, uint3 i
       }*/
     }else{
       vert.pos = _Target;
+      vert.debug.x = _ScaleLerpVal;
       //vert.pos = _Target;
     }
 
