@@ -15,6 +15,7 @@ public class TouchBlarp : Game
     public GameObject grassGrower;
 
     public TubeTransfer enemyHairBody;
+    public TubeTransfer hairBody;
 
     public Hair vectorHair;
     public Hair enemyHair;
@@ -98,6 +99,14 @@ public class TouchBlarp : Game
     public float minTargetRespawnSpeed;
     public int minTargetRespawnSpeedScore;
 
+    public float hairSizeMultiplier;
+    public float hairSizeMax;
+    public float enemyHairSizeMultiplier;
+    public float enemyHairSizeMax;
+
+
+    public int tailPickupScoreMultiplier;
+    public int colorPickupScoreMultiplier;
 
 
     public float targetLength(){
@@ -164,6 +173,7 @@ public class TouchBlarp : Game
 
     }
 
+    public float enemyAttention;
 
     private int frame;
     void Start(){
@@ -244,9 +254,30 @@ public class TouchBlarp : Game
               sharkLR.SetPosition( 0 , shark.transform.position-Camera.main.transform.forward * upConnectionDist * .1f);
               sharkLR.SetPosition( 1 , blarp.transform.position-Camera.main.transform.forward * upConnectionDist * .1f);
               float dist = (shark.transform.position - blarp.transform.position).magnitude;
-              sharkRB.AddForce(Vector3.Scale((shark.transform.position - blarp.transform.position),new Vector3(1,0,1)) * -.3f );
-             
+              
 
+            if( targetInfo.spawned == 1 ){
+
+              enemyAttention += .02f;
+              enemyAttention = Mathf.Clamp( enemyAttention , 0 , 1);
+              Vector3 force1= Vector3.Scale((shark.transform.position - blarp.transform.position),new Vector3(1,0,1)) * -.3f;
+              Vector3 force2= Vector3.Scale((shark.transform.position - target.transform.position),new Vector3(1,0,1)) * -.2f;
+              
+              Vector3 fForce = Vector3.Lerp( force1 , force2 ,enemyAttention );                
+
+                sharkRB.AddForce(fForce);//* targetInfo.spawnLerpVal
+             }else{
+
+                enemyAttention -= .04f;
+              enemyAttention = Mathf.Clamp( enemyAttention , 0 , 1);
+              Vector3 force1= Vector3.Scale((shark.transform.position - blarp.transform.position),new Vector3(1,0,1)) * -.3f;
+              Vector3 force2=Vector3.zero;
+              
+              Vector3 fForce = Vector3.Lerp( force1 , force2 ,enemyAttention );                
+
+                sharkRB.AddForce(fForce);//* targetInfo.spawnLerpVal
+                
+             }
              
              
       
@@ -298,9 +329,7 @@ public class TouchBlarp : Game
       targetInfo.spawnLength = startTargetLength;
       targetInfo.timeBetweenSpawns = startTargetRespawnSpeed;
       shark.transform.position = sharkStartingPosition;
-      TriggerGlitch();
-
-      audio.PlayRestart();
+   audio.PlayRestart();
 
       //blarpTrail.time = .3f;
       //sharkTrail.time = .3f;
@@ -321,8 +350,7 @@ public class TouchBlarp : Game
       sharkRB.useGravity = true;
       blarpRigidBody.mass = BlarpMass();//Mathf.Clamp(.2f,0.00001f,1);
       haptics.TriggerSuccess();
-      MiniGlitch();
-
+      
       SpawnShark();
 
       UpdateTransformBuffer();
@@ -363,35 +391,8 @@ public class TouchBlarp : Game
     }
 
     public override void DoNext(){
-
-    
-
-      targetInfo.spawnLength = targetLength();
-      targetInfo.timeBetweenSpawns = targetRespawnSpeed();
-        vectorHair.length = (float)score/100;
-        enemyHair.length = (float)score/100;
-      
-        blarpRigidBody.mass = BlarpMass();//.2f;//Mathf.Clamp(MASS(),0.00001f,1);
-        currentMass= blarpRigidBody.mass;
-          blarpTrail.time = .3f + (float)score / 20;
-          sharkRB.mass = SharkMass();//Mathf.Clamp(MASS(),0.00001f,1);
-
-
-
-        
-        if( score >= 10 ){ enemyHairBody.showBody = true; }
-          if( score % colorChangeModulus == 0 ){
-            SpawnColorChange();
-          }
-
-          if( score % tailGrowthModulus == 0 ){
-            SpawnTailChange();
-          }
-        
-
         UpdateScore();
 
-        MiniGlitch();
     }
 
 
@@ -404,27 +405,52 @@ public class TouchBlarp : Game
       tailGrowTarget.GetComponent<TailGrowerChanger>().OnSpawn();
     }
 
- 
+   public void TailGrow(){
+      tailSize ++;
+      score += tailPickupScoreMultiplier;
+      Shader.SetGlobalInt("_TailSize" , score );
+      audio.PlayTailTargetHit();
+      UpdateScore();
+    }
+
 
     public void ColorChangeHit(){
-      score += 5;
-      UpdateScore();
+      score += colorPickupScoreMultiplier;
       aesthetics.SetNewColorScheme();
       audio.PlayColorTargetHit();
+      UpdateScore();
     }
     public void UpdateScore(){
+     targetInfo.spawnLength = targetLength();
+      targetInfo.timeBetweenSpawns = targetRespawnSpeed();
+        vectorHair.length = Mathf.Min( (float)score * hairSizeMultiplier , hairSizeMax);
+        enemyHair.length = Mathf.Min( (float)score * enemyHairSizeMultiplier , enemyHairSizeMax );
+      
+        blarpRigidBody.mass = BlarpMass();//.2f;//Mathf.Clamp(MASS(),0.00001f,1);
+        currentMass= blarpRigidBody.mass;
+          blarpTrail.time = .3f + (float)score / 20;
+          sharkRB.mass = SharkMass();//Mathf.Clamp(MASS(),0.00001f,1);
+
+enemyHairBody.radius = Random.Range( .7f , 1.4f ) * .08f / (1 + enemyHair.length);
+hairBody.radius = Random.Range( .7f , 1.4f ) * .08f / (1 + vectorHair.length);
+
+
+        
+        if( score >= 2 ){ enemyHairBody.showBody = true; }
+          if( score % colorChangeModulus == 0 ){
+            SpawnColorChange();
+          }
+
+          if( score % tailGrowthModulus == 0 ){
+            SpawnTailChange();
+          }
+        
 
       scoreText.text = ""+score;
       Shader.SetGlobalInt("_Score" , score );
 
     }
 
-    public void TailGrow(){
-      tailSize ++;
-      Shader.SetGlobalInt("_TailSize" , score );
-      audio.PlayTailTargetHit();
-
-    }
 
     public void SpawnShark(){
     
@@ -433,32 +459,6 @@ public class TouchBlarp : Game
 
     }
 
-    public void TriggerGlitch(){
-    /*glitch.glitchPow = 0;
-    glitch.glitchStartTime = Time.time;
-    glitch.enabled = true;
-    float p = Random.Range( 0, .99f);
-    glitch.glitchLength = 1.5f + p;
-
-    glitch.glitchSize = .1f;
-    glitch.glitchAmount = 3.5f;*/
-
-  }
-
-
-  public void MiniGlitch(){
-   /* glitch.glitchPow = 0;
-    glitch.glitchStartTime = Time.time;
-    glitch.glitchSize = .2f + (float)score/40;
-    glitch.glitchAmount = .1f+ (float)score/300;
-    glitch.enabled = true;
-    float p = Random.Range( 0, .99f);
-    glitch.glitchLength = .1f + p * .3f;*/
-  }
-
-  public void EmitParticles( int count ){
-    //targetHitParticles.Emit( count);
-  }
 
 
   private const string TWITTER_ADDRESS = "http://twitter.com/intent/tweet";

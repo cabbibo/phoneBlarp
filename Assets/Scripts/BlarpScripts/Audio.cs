@@ -17,6 +17,9 @@ public class Audio : MonoBehaviour
     public AudioSource closenessLoop;
     public AudioSource velocityLoop;
 
+    public float closenessMultiplier;
+    public float closenessPow;
+
 
 
     public int[] steps;
@@ -61,6 +64,7 @@ public class Audio : MonoBehaviour
 
     public void PlayTailTargetHit(){
 
+PlayClip(tailSounds);
     }
 
     public void PlayColorTargetHit(){
@@ -75,7 +79,7 @@ PlayClip(colorSounds);
 
     public void DoCloseness(){
 
-      float target = 4 / (game.blarp.transform.position - game.shark.transform.position).magnitude;
+      float target = closenessMultiplier / Mathf.Pow( (game.blarp.transform.position - game.shark.transform.position).magnitude , closenessPow);
       closenessLoop.volume = Mathf.Lerp( closenessLoop.volume , target , .1f );
       closenessLoop.pitch = Mathf.Lerp( closenessLoop.pitch , target , .1f );
 

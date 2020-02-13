@@ -19,6 +19,7 @@ public class TargetInfo : MonoBehaviour
     public float timeBetweenSpawns;
 
     public int spawned;
+    public float spawnLerpVal;
 
     private Collider thisCollider;
 
@@ -40,6 +41,8 @@ public class TargetInfo : MonoBehaviour
         }
 
         v = (Time.time - spawnTime) / spawnLength;
+
+        spawnLerpVal = v;
         if( v > 1 && spawned == 1 ){
           Despawn();
         }else{
@@ -58,6 +61,10 @@ public class TargetInfo : MonoBehaviour
     void OnTriggerEnter( Collider c ){
       if( c.gameObject.tag == "arrow" ){
         OnHit();
+      }
+
+      if( c.gameObject.tag == "Enemy"){
+        Despawn();
       }
     }
 
