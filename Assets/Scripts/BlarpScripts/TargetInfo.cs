@@ -64,6 +64,7 @@ public class TargetInfo : MonoBehaviour
       }
 
       if( c.gameObject.tag == "Enemy"){
+        game.OnEnemyCollect();
         Despawn();
       }
     }
@@ -91,11 +92,48 @@ public class TargetInfo : MonoBehaviour
       RaycastHit hit;
       if (collider.Raycast(ray, out hit, 100.0f))
       {
-        transform.position = hit.point + Camera.main.transform.forward * -.2f;
+
+        if( game.inMenu){
+          print("IN MENNU");
+          transform.position = spawnInMenu();
+        }else{
+          transform.position = hit.point + Camera.main.transform.forward * -.2f;
+        }
+
         spawnTime = Time.time;
       }else{
         print("SPAWNING INCORRECTIO!");
       }
+    }
+
+    public Vector3 spawnInMenu(){
+
+      float x;
+      if( game.blarp.transform.position.x > 0 ){
+        x = Random.Range( .2f , .4f );
+      }else{
+        x = Random.Range( .6f , .8f );
+      }
+
+      float y;
+      if( game.blarp.transform.position.z > 0 ){
+        y = Random.Range( .2f , .4f );
+      }else{
+        y = Random.Range( .6f , .7f );
+      }
+
+      Ray ray = Camera.main.ScreenPointToRay(new Vector3(x * Screen.width,y* Screen.height, 0));
+      RaycastHit hit;
+      Vector3 position = Vector3.zero;
+      if (collider.Raycast(ray, out hit, 100.0f))
+      {
+        position = hit.point;
+      }else{
+        print("SPAWNING INCORRECTIO!");
+      }
+
+      return position;
+
     }
 
 

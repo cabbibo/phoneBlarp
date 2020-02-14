@@ -53,9 +53,9 @@
                 if( col.a < .1 ){
                     discard;
                 }
-                col = .1 * col.a + .9;
-                if( col.a < .9 ){ col = 0; }
-                col *= tex2D(_GlobalColorMap , v.world.x * .1 + v.world.z * .1 + _Time.y );
+                col = col.a;
+                //col *= tex2D(_GlobalColorMap , v.world.x * .1 + v.world.z * .1 + _Time.y * .3 + v.uv.x );
+                //if( col.a -.1 < .9 ){ col = float4(1,0,0,1); }
                 return col;
             }
             ENDCG

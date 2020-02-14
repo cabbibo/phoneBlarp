@@ -16,6 +16,7 @@ int _VertBuffer_COUNT;
 int _SkeletonBuffer_COUNT;
 
 float4x4 _Transform;
+float3 _Velocity;
 
 
 #include "../Chunks/safeID.cginc"
@@ -29,7 +30,11 @@ void Transfer (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
   Vert v = _VertBuffer[ safeID(pID,_VertBuffer_COUNT)];
 
   float3 tPos = mul( _Transform ,float4(s.pos,1)).xyz;
-  v.nor = normalize(mul( _Transform ,float4(s.nor,0)).xyz);
+  float3 tNor = normalize(mul( _Transform ,float4(s.nor,0)).xyz);
+
+  if( length( _Velocity ) > .01 ){
+    tPos += (-_Velocity * .04 + tNor* dot( normalize(_Velocity) , tNor) * .1 + _Velocity * .03 * dot(normalize(_Velocity),tNor)) * clamp( length(_Velocity) * 10, 0 ,1);
+  }
 
   float3 force = 0;
   /*force += tPos - v.pos;
@@ -40,6 +45,7 @@ void Transfer (uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID) {
 
   v.vel = tPos - v.pos;
   v.pos = tPos;
+  v.nor = tNor;
 
   _VertBuffer[ safeID(pID,_VertBuffer_COUNT)] = v;
 

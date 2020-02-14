@@ -108,6 +108,8 @@ public class TouchBlarp : Game
     public int tailPickupScoreMultiplier;
     public int colorPickupScoreMultiplier;
 
+    public ShowInfo gameInfo;
+
 
     public float targetLength(){
       float v1 = startTargetLength - minTargetLength;
@@ -203,7 +205,6 @@ public class TouchBlarp : Game
             
             breath.breathing = false;
 
-            if( inMenu == true ){ inMenu = false; }
 
               Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
               RaycastHit hit;
@@ -296,9 +297,12 @@ public class TouchBlarp : Game
             //blarp.transform.position = blarpStartingPosition;
             shark.transform.position = sharkStartingPosition;
             sharkRB.velocity = Vector3.zero;
-            touch.transform.position = touchStartingPosition;
             //target.transform.position = targetStartingPosition;
 
+          }
+
+          if( gameInfo.active == null ){
+            blarp.transform.position = blarpStartingPosition;
           }
 
 
@@ -311,7 +315,8 @@ public class TouchBlarp : Game
     
 
     public override void DoRestart(){
-
+gameInfo.TurnOff();
+            touch.transform.position = touchStartingPosition;
 
       //blarpRigidBody.velocity = Vector3.zero;
       
@@ -345,6 +350,7 @@ public class TouchBlarp : Game
 
     public override void DoStart(){
 
+            if( inMenu == true ){ inMenu = false; }
       targetInfo.spawnLength = targetLength();
       targetInfo.timeBetweenSpawns = targetRespawnSpeed();
       sharkRB.useGravity = true;
@@ -396,12 +402,20 @@ public class TouchBlarp : Game
     }
 
 
+    public void OnEnemyCollect(){
+      audio.PlayEnemyPickup();
+    }
+
+
     public void SpawnColorChange(){
+      audio.SpawnColor();
       colorChangeTarget.GetComponent<ColorSchemeChanger>().OnSpawn();
     }
 
 
     public void SpawnTailChange(){
+
+      audio.SpawnTail();
       tailGrowTarget.GetComponent<TailGrowerChanger>().OnSpawn();
     }
 
@@ -454,7 +468,7 @@ hairBody.radius = Random.Range( .7f , 1.4f ) * .08f / (1 + vectorHair.length);
 
     public void SpawnShark(){
     
-      shark.transform.position  = blarp.transform.position - blarpRigidBody.velocity.normalized * 3;// -Camera.main.transform.forward;
+      shark.transform.position  = targetInfo.spawnInMenu();//blarp.transform.position - blarpRigidBody.velocity.normalized * 3;// -Camera.main.transform.forward;
       sharkRB.velocity = Vector3.zero;
 
     }

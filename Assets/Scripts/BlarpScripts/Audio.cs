@@ -11,11 +11,20 @@ public class Audio : MonoBehaviour
     public AudioClip[] dieSounds;
     public AudioClip[] startSounds;
     public AudioClip[] colorSounds;
+    public AudioClip[] spawnColorSounds;
+    public AudioClip[] despawnColorSounds;
     public AudioClip[] tailSounds;
+    public AudioClip[] spawnTailSounds;
+    public AudioClip[] despawnTailSounds;
     public AudioClip[] targetSounds;
+    public AudioClip[] spawnTargetSounds;
+    public AudioClip[] despawnTargetSounds;
+    public AudioClip[] enemyCollectsSounds;
     public AudioClip[] wallSounds;
     public AudioSource closenessLoop;
     public AudioSource velocityLoop;
+
+
 
     public float closenessMultiplier;
     public float closenessPow;
@@ -70,6 +79,35 @@ PlayClip(tailSounds);
     public void PlayColorTargetHit(){
       print("hiii");
 PlayClip(colorSounds);
+    }
+
+    public void PlayEnemyPickup(){
+      PlayClip(enemyCollectsSounds);
+    }
+
+    public void SpawnColor(){
+      PlayClip(spawnColorSounds);
+    }
+
+    public void SpawnTail(){
+      PlayClip(spawnTailSounds);
+    }
+
+    public void SpawnTarget(){
+      PlayClip(spawnTargetSounds);
+    }
+
+
+    public void DespawnColor(){
+      PlayClip(despawnColorSounds);
+    }
+
+    public void DespawnTails(){
+      PlayClip(despawnTailSounds);
+    }
+
+    public void DespawnTarget(){
+      PlayClip(despawnTargetSounds);
     }
 
     public void DoWallHit(float magnitude){
