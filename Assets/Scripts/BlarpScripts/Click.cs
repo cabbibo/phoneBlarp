@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.iOS;
+//using UnityEngine.iOS;
 
 // Input.GetTouch example.
 //
@@ -51,15 +51,17 @@ public class Click : MonoBehaviour
             if (collider.Raycast(ray, out hit, 100.0f))
             {
                 touchRep.position = hit.point;
-                touchMat.color = new Color(1,0,0,1);
+                touchMat.color = new Color(1, 0, 0, 1);
                 force += touchRep.position - chaserRep.position;
             }
             //print( Camera.main.ScreenToWorldPoint( new Vector3( Input.mousePosition.x , Input.mousePosition.y , Camera.main.nearClipPlane ) );
-           
+
             //Debug.Log("Pressed left click.");
-        }else{
-          // touchRep.position = new Vector3(10000 , 0,0);
-           touchMat.color = new Color(0,1,0,1); 
+        }
+        else
+        {
+            // touchRep.position = new Vector3(10000 , 0,0);
+            touchMat.color = new Color(0, 1, 0, 1);
         }
 
 

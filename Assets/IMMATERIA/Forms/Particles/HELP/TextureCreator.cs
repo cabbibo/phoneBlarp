@@ -35,7 +35,7 @@ public class TextureCreator : MonoBehaviour {
 	
 	public void FillTexture () {
 		if (texture.width != resolution) {
-			texture.Resize(resolution, resolution);
+			texture.Reinitialize(resolution, resolution);
 		}
 		
 		Vector3 point00 = transform.TransformPoint(new Vector3(-0.5f,-0.5f));

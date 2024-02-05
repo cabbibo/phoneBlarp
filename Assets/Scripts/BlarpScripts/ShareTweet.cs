@@ -7,15 +7,20 @@ public class ShareTweet : MonoBehaviour
 
   public TouchBlarp game;
   public int shareID;
-    
-     void OnMouseDown()
+
+  void OnMouseDown()
+  {
+    if (shareID == 0)
     {
-      if( shareID == 0 ){
       game.ShareToTwitter();
-      }else if( shareID == 1){
-        game.ShareToFacebook();
-      }else{
-        game.ShareToAppStore();
-      }
     }
+    else if (shareID == 1)
+    {
+      game.ShareToFacebook();
+    }
+    else
+    {
+      game.ShareToAppStore();
+    }
+  }
 }

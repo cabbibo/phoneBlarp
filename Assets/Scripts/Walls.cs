@@ -7,78 +7,100 @@ public class Walls : MonoBehaviour
 
   public Game game;
 
-    public GameObject wallPrefab;
-    public GameObject platform;
+  public GameObject wallPrefab;
+  public GameObject platform;
 
-    public ScreenInfo screen;
-
-
-
-    public Vector4[] hits;
-public int currHit;
-
-    public Material wallMat;
-
-    public float wallWidth;
-    public GameObject[] walls;
-
-    public void MakeWalls(){
-
-      walls = new GameObject[4];
+  public ScreenInfo screen;
 
 
-      hits = new Vector4[10];
-      GameObject go;
-        go = Instantiate( wallPrefab );
-        go.transform.position = new Vector3( screen.width /2 , 0 , 0 );
-        go.transform.localScale = new Vector3( wallWidth  , 10, screen.height );
-        walls[0] = go;
 
-        go = Instantiate( wallPrefab );
-        go.transform.position = new Vector3( -screen.width /2, 0 , 0 );
-        go.transform.localScale = new Vector3( wallWidth  , 10 ,screen.height );
-        go.transform.rotation = Quaternion.AngleAxis( 180 , Vector3.up);
-        walls[1] = go;
+  public Vector4[] hits;
+  public int currHit;
 
-        go = Instantiate( wallPrefab );
-        go.transform.position = new Vector3( 0 ,0 , screen.height/2 );
-        go.transform.localScale = new Vector3( screen.width , 10 ,wallWidth );
-        walls[2] = go;
+  public Material wallMat;
 
-        go = Instantiate( wallPrefab );
-        go.transform.position = new Vector3( 0 , 0, -screen.height/2 );
-        go.transform.localScale = new Vector3( screen.width , 10,wallWidth  );
-        go.transform.rotation = Quaternion.AngleAxis( 180 , Vector3.up);
-        walls[3] = go;
+  public float wallWidth;
+  public GameObject[] walls;
+
+  public void MakeWalls()
+  {
+
+    walls = new GameObject[4];
 
 
-        wallMat = go.GetComponent<Renderer>().sharedMaterial;
-        platform.transform.localScale = new Vector3( screen.width , 10, screen.height  ) * .1f; 
+    hits = new Vector4[10];
+    GameObject go;
+    go = Instantiate(wallPrefab);
+    go.transform.position = new Vector3(screen.width / 2, 0, 0);
+    go.transform.localScale = new Vector3(wallWidth, 10, screen.height);
+    walls[0] = go;
 
-    }
+    go = Instantiate(wallPrefab);
+    go.transform.position = new Vector3(-screen.width / 2, 0, 0);
+    go.transform.localScale = new Vector3(wallWidth, 10, screen.height);
+    go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+    walls[1] = go;
 
-    public void DestroyWalls(){
-      if( walls.Length == 4 ){
-      for( int i = 0; i <4; i++ ){
-        DestroyImmediate( walls[i]);
+    go = Instantiate(wallPrefab);
+    go.transform.position = new Vector3(0, 0, screen.height / 2);
+    go.transform.localScale = new Vector3(screen.width, 10, wallWidth);
+    walls[2] = go;
+
+    go = Instantiate(wallPrefab);
+    go.transform.position = new Vector3(0, 0, -screen.height / 2);
+    go.transform.localScale = new Vector3(screen.width, 10, wallWidth);
+    go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+    walls[3] = go;
+
+    EnemyCollect(0);
+
+
+    wallMat = go.GetComponent<Renderer>().sharedMaterial;
+    platform.transform.localScale = new Vector3(screen.width, 10, screen.height) * .1f;
+
+  }
+
+  public void DestroyWalls()
+  {
+    if (walls.Length == 4)
+    {
+      for (int i = 0; i < 4; i++)
+      {
+        DestroyImmediate(walls[i]);
       }
     }
-    }
+  }
+
+  public void EnemyCollect(int score)
+  {
+
+    wallWidth = (float)score + 1f;
+
+    walls[0].transform.position = new Vector3(screen.width / 2, 0, 0);
+    walls[1].transform.position = new Vector3(-screen.width / 2, 0, 0);
+    walls[2].transform.position = new Vector3(0, 0, screen.height / 2);
+    walls[3].transform.position = new Vector3(0, 0, -screen.height / 2);
+
+    walls[0].transform.localScale = new Vector3(wallWidth, 10, screen.height);
+    walls[1].transform.localScale = new Vector3(wallWidth, 10, screen.height);
+    walls[2].transform.localScale = new Vector3(screen.width, 10, wallWidth);
+    walls[3].transform.localScale = new Vector3(screen.width, 10, wallWidth);
+
+  }
+  public void SetWallCollision(Vector3 location, float magnitude)
+  {
+
+    //  print( location );
+    currHit += 1;
+    currHit %= hits.Length;
+    hits[0] = new Vector4(location.x, location.y, location.z, Time.time);
+
+    wallMat.SetVectorArray("_Hits", hits);
+
+    //  print("hi");
+
+    game.DoWallHit(magnitude);
 
 
-public void SetWallCollision(Vector3 location,float magnitude){
-
-//  print( location );
-  currHit += 1;
-  currHit %= hits.Length;
-  hits[0] = new Vector4( location.x , location.y , location.z , Time.time );
-
-  wallMat.SetVectorArray( "_Hits" , hits );
-
-//  print("hi");
-
-  game.DoWallHit(magnitude);
-
-
-}
+  }
 }
